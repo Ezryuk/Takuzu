@@ -25,10 +25,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        MainWindow.cpp
+        MainWindow.cpp \
+    ModelTakuzu.cpp
 
 HEADERS += \
-        MainWindow.h
+        MainWindow.h \
+    ModelTakuzu.h
 
 FORMS += \
         MainWindow.ui
