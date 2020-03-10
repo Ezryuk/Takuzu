@@ -8,11 +8,16 @@ class ModelTakuzu
 {
 public:
     ModelTakuzu();
-    void loadFile(const QString &name);
+    void loadFile(const QString &name); // it will be private later
 private:
-    uint _nbMaps;
-    uint _sizeMap;
-
+    int _nbMaps;
+    int _sizeMap;
+    enum Difficulty {
+        Easy,
+        Hard
+    };
+    Difficulty _difficulty;
+    char **_grids;
 };
 
 #endif // MODELTAKUZU_H

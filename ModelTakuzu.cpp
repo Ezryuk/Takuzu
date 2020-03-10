@@ -2,9 +2,13 @@
 
 #include <iostream>
 
+
 ModelTakuzu::ModelTakuzu()
 {
-
+    _nbMaps = -1;
+    _sizeMap = -1;
+    _difficulty = Easy;
+    _grids = nullptr;
 }
 
 void ModelTakuzu::loadFile(const QString &name)
@@ -22,7 +26,23 @@ void ModelTakuzu::loadFile(const QString &name)
         // get size of grid
         _sizeMap = name.at(0).digitValue();
         if (_sizeMap == -1) {
-            std::cerr << "Issur when reading size of map. \n";
+            std::cerr << "Issue when reading size of map. \n";
+        }
+
+        // each map in separate line until EOF
+        // char **_grids;
+        _grids = new char*[_nbMaps];
+        for (int i = 0; i < _nbMaps; ++i) {
+            _grids[i] = new char[_sizeMap]();
+            for (int j = 0; j < _sizeMap; ++j) {
+                _grids[i][j] = ((_nbMaps * i + j) % 2 == 0 )? 'B' : '.';
+                std::cerr << _grids[i][j] << " | ";
+            }
+            std::cerr << "\n";
+        }
+        while (lineLenghth != -1) {
+            lineLenghth = file.readLine(buffer, sizeof(buffer));
+
         }
     }
 }
