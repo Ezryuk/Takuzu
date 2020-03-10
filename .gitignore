@@ -1,2 +1,5 @@
 *.o
 *.obj
+build-debug/
+build-profile/
+build-release/

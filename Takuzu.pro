@@ -26,11 +26,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         MainWindow.cpp \
-    Grid.cpp
+
+    Grid.cpp\
+    ModelTakuzu.cpp
 
 HEADERS += \
         MainWindow.h \
-    Grid.h
+    Grid.h\
+    ModelTakuzu.h
 
 FORMS += \
         MainWindow.ui
