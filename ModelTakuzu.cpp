@@ -1,7 +1,9 @@
 #include "ModelTakuzu.h"
 
 #include <iostream>
-
+#include <QFile>
+#include <QByteArray>
+#include <cstring>
 
 ModelTakuzu::ModelTakuzu()
 {
@@ -9,40 +11,64 @@ ModelTakuzu::ModelTakuzu()
     _sizeMap = -1;
     _difficulty = Easy;
     _grids = nullptr;
+    _currentGrid = nullptr;
 }
 
 void ModelTakuzu::loadFile(const QString &name)
 {
     QFile file(name);
     if (file.open(QFile::ReadOnly)) {
-        char buffer[64];
-        qint64 lineLenghth = file.readLine(buffer, sizeof(buffer));
+        QByteArray line;
+
         // read number of grids in file
-        if (lineLenghth != -1) {
-            _nbMaps = atoi(buffer);
-        } else {
+        bool ok = true;
+        _nbMaps = file.readLine().toInt(&ok);
+        if (!ok) {
             std::cerr << "Issue when reading new line. \n";
         }
+
         // get size of grid
         _sizeMap = name.at(0).digitValue();
         if (_sizeMap == -1) {
             std::cerr << "Issue when reading size of map. \n";
         }
 
-        // each map in separate line until EOF
+        // read each map in separate line until EOF
         // char **_grids;
         _grids = new char*[_nbMaps];
         for (int i = 0; i < _nbMaps; ++i) {
-            _grids[i] = new char[_sizeMap]();
-            for (int j = 0; j < _sizeMap; ++j) {
-                _grids[i][j] = ((_nbMaps * i + j) % 2 == 0 )? 'B' : '.';
-                std::cerr << _grids[i][j] << " | ";
-            }
-            std::cerr << "\n";
+            _grids[i] = new char[_sizeMap * _sizeMap]();
         }
-        while (lineLenghth != -1) {
-            lineLenghth = file.readLine(buffer, sizeof(buffer));
-
+        {
+            int i = 0;
+            while (!file.atEnd()) {
+                line = file.readLine();
+                memcpy(_grids[i++], line.constData(), sizeof(char) * _sizeMap * _sizeMap);
+            }
         }
     }
 }
+
+void ModelTakuzu::setDifficulty(ModelTakuzu::Difficulty difficulty)
+{
+    _difficulty = difficulty;
+}
+
+void ModelTakuzu::setSize(int size)
+{
+    _sizeMap = size;
+}
+
+void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
+{
+    QString name = QString::number(size);
+    if (difficulty == Easy) {
+        name.append("_easy.txt");
+    } else /* (difficulty == Hard) */ {
+        name.append("_hard.txt");
+    }
+}
+
+
+
+

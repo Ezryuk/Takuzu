@@ -12,6 +12,5 @@ int main(int argc, char *argv[])
 //    return a.exec();
 
     ModelTakuzu *model = new ModelTakuzu();
-    model->loadFile(QString("6_easy.txt"));
-
+    model->chooseMapPool(ModelTakuzu::Easy, 6);
 }
