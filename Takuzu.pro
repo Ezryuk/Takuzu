@@ -27,12 +27,16 @@ SOURCES += \
         main.cpp \
         MainWindow.cpp \
         Grid.cpp \
-        ModelTakuzu.cpp
+        ModelTakuzu.cpp \
+    IObserver.cpp \
+    Observable.cpp
 
 HEADERS += \
         MainWindow.h \
         Grid.h \
-        ModelTakuzu.h
+        ModelTakuzu.h \
+    IObserver.h \
+    Observable.h
 
 FORMS += \
         MainWindow.ui
