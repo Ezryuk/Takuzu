@@ -3,3 +3,4 @@
 build-debug/
 build-profile/
 build-release/
+*.user
