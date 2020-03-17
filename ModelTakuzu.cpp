@@ -131,6 +131,7 @@ void ModelTakuzu::playAt(int i, int j, Pawn pawn)
 
 }
 
+
 void ModelTakuzu::updateCount()
 {
     for (int i = 0; i < _sizeMap * _sizeMap; ++i) {
@@ -179,13 +180,8 @@ void ModelTakuzu::updateCount(int i, int j, Pawn oldPawn, Pawn newPawn)
     }
 }
 
-
-
-bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
+bool ModelTakuzu::positionIsValid(int i, int j) const
 {
-    char oldPawn = _currentGrid[i * _sizeMap + j];
-    playAt(i, j, pawn); // simulate the play
-
     char rowToScan[_sizeMap];
     memcpy(rowToScan, _currentGrid + _sizeMap * i, sizeof(char) * _sizeMap);
 
@@ -204,14 +200,56 @@ bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
     int oneOtherIdenticalRow = findFirstIdenticalRow(i);
     int oneOtheerIdenticalCol = findFirstIdenticalCol(j);
 
-    _currentGrid[i * _sizeMap + j] = oldPawn; // undo the simulation
+
     return (!repetitionInRow &&
             !repetitionInCol &&
             (oneOtherIdenticalRow == _sizeMap) &&
             (oneOtheerIdenticalCol == _sizeMap));
 }
 
-int ModelTakuzu::findFirstIdenticalRow(int i)
+bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
+{
+    char oldPawn = _currentGrid[i * _sizeMap + j];
+    playAt(i, j, pawn); // simulate the play
+    bool result = positionIsValid(i, j);
+    _currentGrid[i * _sizeMap + j] = oldPawn; // undo the simulation
+    return result;
+}
+
+bool ModelTakuzu::rowIsValid(int i)
+{
+    static auto forAll = [](bool tab[], int length) -> bool {
+        for (int i = 0; i < length; ++i) {
+            if (!tab[i]) return false;
+        }
+        return true;
+    };
+    bool tab[_sizeMap];
+    for (int j = 0; j < _sizeMap; ++j) {
+        tab[j] = positionIsValid(i, j);
+    }
+    return forAll(tab, _sizeMap) &&
+            (_countPawn._Brow[i] == _countPawn._Wrow[i]);
+}
+
+bool ModelTakuzu::colIsValid(int j)
+{
+    static auto forAll = [](bool tab[], int length) -> bool {
+        for (int i = 0; i < length; ++i) {
+            if (!tab[i]) return false;
+        }
+        return true;
+    }; // better allocate lambda twice in total rather than create a
+    // private method ?
+    bool tab[_sizeMap];
+    for (int i = 0; i < _sizeMap; ++i) {
+        tab[i] = positionIsValid(i, j);
+    }
+    return forAll(tab, _sizeMap) &&
+            (_countPawn._Bcol[j] == _countPawn._Wcol[j]);
+}
+
+int ModelTakuzu::findFirstIdenticalRow(int i) const
 {
     char rowToScan[_sizeMap];
     memcpy(rowToScan, _currentGrid + _sizeMap * i, sizeof(char) * _sizeMap);
@@ -229,7 +267,7 @@ int ModelTakuzu::findFirstIdenticalRow(int i)
     return _sizeMap; // we reached the end of rows list, no similarities found
 }
 
-int ModelTakuzu::findFirstIdenticalCol(int j)
+int ModelTakuzu::findFirstIdenticalCol(int j) const
 {
     char colToScan[_sizeMap];
     for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {

@@ -24,11 +24,24 @@ public:
     void chooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
     void setRandomMap();
     void playAt(int i, int j, Pawn pawn);
+    bool positionIsValid(int i, int j) const;
+    /**
+     * @brief positionIsValid \
+     * no const because we simulate the play of pawn at (i,j)
+     * @param i
+     * @param j
+     * @param pawn
+     * @return
+     */
     bool positionIsValid(int i, int j, Pawn pawn); // no const because we simulate the play so attributes are modified
+    bool rowIsValid(int i) const;
+    bool colIsValid(int j) const;
     void updateCount();
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
+
 public slots:
     void playAt(int i, int j);
+
 public: // public "attributes". Replace getter + setter
     char *_currentGrid;
     struct {
@@ -46,16 +59,14 @@ private: // private methods
      * n° indexOfUpdatedRow. \
      * _sizeOfMap if no identical row found
      */
-    int findFirstIdenticalRow(int indexOfUpdatedRow);
-    int findFirstIdenticalCol(int indexOfUpdatedCol);
+    int findFirstIdenticalRow(int indexOfUpdatedRow) const;
+    int findFirstIdenticalCol(int indexOfUpdatedCol) const;
+
 private: // attributes
     int _nbMaps;
     int _sizeMap;
-
     Difficulty _difficulty;
     char **_grids;
-
-
 
 };
 
