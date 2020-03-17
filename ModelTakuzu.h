@@ -29,6 +29,15 @@ public:
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
 public slots:
     void playAt(int i, int j);
+public: // public "attributes". Replace getter + setter
+    char *_currentGrid;
+    struct {
+        char *_Wrow;
+        char *_Brow;
+        char *_Wcol;
+        char *_Bcol;
+    } _countPawn;
+
 private: // private methods
     /**
      * @brief findFirstIdenticalRow
@@ -45,13 +54,7 @@ private: // attributes
 
     Difficulty _difficulty;
     char **_grids;
-    char *_currentGrid;
-    struct {
-        char *_Wrow;
-        char *_Brow;
-        char *_Wcol;
-        char *_Bcol;
-    } _countPawn;
+
 
 
 };
