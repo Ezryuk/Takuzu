@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPainter>
+#include "ModelTakuzu.h"
 
 class QPaintEvent;
 
@@ -14,14 +15,25 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *) override;
-    void paintPawn(int row, int column);
+    void paintPawn(int row, int column, Pawn p);
+    /**
+     * @param isRow true if row / false if column
+     * @param index row or column index
+     * @param black number of black pawns
+     * @param white number of white pawns
+     */
+    void paintCount(bool isRow, int index, int black, int white);
 
 signals:
 
 public slots:
 
 private:
+    int _rows = 8;
     QPainter * _painter;
+    QRect** _rects;
+    QRect* _rowCount;
+    QRect* _columnCount;
 };
 
 #endif // GRID_H
