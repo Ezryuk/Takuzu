@@ -8,6 +8,19 @@
 #include <cstring>
 #include <cassert>
 
+namespace TakuzuUtils {
+/**
+ * @brief isBBBorWWWpresentIn is not meant to be used by external user \
+ *
+ * @param strToScan pointer to the beginning of char[] to be scanned
+ * @return true or false
+ */
+bool isBBBorWWWpresentIn(char *strToScan);
+Pawn permuteR(Pawn p);
+Pawn toPawn(char c);
+char toChar(Pawn p);
+}
+
 ModelTakuzu::ModelTakuzu()
 {
     _nbMaps = -1;
@@ -15,6 +28,7 @@ ModelTakuzu::ModelTakuzu()
     _difficulty = Easy;
     _grids = nullptr;
     _currentGrid = nullptr;
+    _countPawn = {nullptr, nullptr, nullptr, nullptr};
 }
 
 void ModelTakuzu::loadFile(const QString &name)
@@ -77,6 +91,17 @@ void ModelTakuzu::setRandomMap()
     _currentGrid = new char[_sizeMap * _sizeMap]();
     // load a fresh new grid in _current grid
     memcpy(_currentGrid, _grids[randomGridIndex], sizeof(char) * _sizeMap * _sizeMap);
+
+    delete _countPawn._Wrow;
+    delete _countPawn._Brow;
+    delete _countPawn._Wcol;
+    delete _countPawn._Bcol;
+    _countPawn = {
+        new char[_sizeMap](),
+        new char[_sizeMap](),
+        new char[_sizeMap](),
+        new char[_sizeMap]()
+    };
 }
 
 void ModelTakuzu::playAt(int i, int j, Pawn pawn)
@@ -86,28 +111,75 @@ void ModelTakuzu::playAt(int i, int j, Pawn pawn)
     // we could create a map (pawn=>letter) but for 3 elements, not necessary
     char c = 'E'; // E stands for error
     switch (pawn) {
-    case Black: c = 'B'; break;
-    case White: c = 'W'; break;
-    case Empty: c = '.'; break;
-    default: c = ' '; break;}
+    case Black:
+        c = 'B';
+        break;
+    case White:
+        c = 'W';
+        break;
+    case Empty:
+        c = '.';
+        break;
+    default:
+        c = ' ';
+        break;
+    }
+    Pawn oldPawn = TakuzuUtils::toPawn(_currentGrid[i * _sizeMap + j]);
+    Pawn newPawn = pawn;
+    updateCount(i, j, oldPawn, newPawn);
     _currentGrid[i * _sizeMap + j] = c;
+
 }
 
-namespace TakuzuUtils {
-/**
- * @brief isBBBorWWWpresentIn is not meant to be used by external user \
- *
- * @param strToScan pointer to the beginning of char[] to be scanned
- * @return true or false
- */
-bool isBBBorWWWpresentIn(char *strToScan);
-bool isBBBorWWWpresentIn(char *strToScan) {
-    std::cout << "strToScan: " << strToScan << "\n";
-    char *occurencePointerWWW = strstr(strToScan, "WWW");
-    char *occurrencePointerBBB = strstr(strToScan, "BBB");
-    return (occurencePointerWWW != NULL || occurrencePointerBBB != NULL);
+void ModelTakuzu::updateCount()
+{
+    for (int i = 0; i < _sizeMap * _sizeMap; ++i) {
+        switch (_currentGrid[i]) {
+        case 'B':
+            _countPawn._Brow[i / _sizeMap]++;
+            _countPawn._Bcol[i % _sizeMap]++;
+            break;
+        case 'W':
+            _countPawn._Wrow[i / _sizeMap]++;
+            _countPawn._Wcol[i % _sizeMap]++;
+            break;
+        default:
+            break;
+        }
+    }
 }
+
+void ModelTakuzu::updateCount(int i, int j, Pawn oldPawn, Pawn newPawn)
+{
+    if (oldPawn != newPawn) {
+        switch (oldPawn) {
+        case Black:
+            _countPawn._Brow[i]--;
+            _countPawn._Bcol[j]--;
+            break;
+        case White:
+            _countPawn._Wrow[i]--;
+            _countPawn._Wcol[j]--;
+            break;
+        case Empty:
+            break;
+        }
+        switch (newPawn) {
+        case Black:
+            _countPawn._Brow[i]++;
+            _countPawn._Bcol[j]++;
+            break;
+        case White:
+            _countPawn._Wrow[i]++;
+            _countPawn._Wcol[j]++;
+            break;
+        case Empty:
+            break;
+        }
+    }
 }
+
+
 
 bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
 {
@@ -186,7 +258,51 @@ int ModelTakuzu::findFirstIdenticalCol(int j)
 }
 
 
+void ModelTakuzu::playAt(int i, int j)
+{
+    playAt(i, j, TakuzuUtils::
+           permuteR(TakuzuUtils::
+                    toPawn(_currentGrid[i * _sizeMap + j])));
+}
 
+namespace TakuzuUtils {
+
+bool isBBBorWWWpresentIn(char *strToScan) {
+    std::cout << "strToScan: " << strToScan << "\n";
+    char *occurencePointerWWW = strstr(strToScan, "WWW");
+    char *occurrencePointerBBB = strstr(strToScan, "BBB");
+    return (occurencePointerWWW != NULL || occurrencePointerBBB != NULL);
+}
+
+Pawn permuteR(Pawn p) {
+    if (p == Black) {
+        return White;
+    } else if (p == White) {
+        return Empty;
+    } else /* if (p == Empty) */ {
+        return Black;
+    }
+}
+
+Pawn toPawn(char c) {
+    switch (c) {
+    case 'B': return Black;
+    case 'W': return White;
+    case '.': return Empty;
+    default: return Empty;
+    }
+}
+
+char toChar(Pawn p) {
+    switch (p) {
+    case Black: return 'B';
+    case White: return 'W';
+    case Empty: return '.';
+    default: return '.';
+    }
+}
+
+}
 
 
 

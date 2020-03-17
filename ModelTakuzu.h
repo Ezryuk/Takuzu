@@ -1,6 +1,7 @@
 #ifndef MODELTAKUZU_H
 #define MODELTAKUZU_H
 
+#include <QObject>
 #include <QString>
 #include <ctime>
 
@@ -10,9 +11,9 @@ enum Pawn {
     Empty
 };
 
-class ModelTakuzu
+class ModelTakuzu : public QObject
 {
-
+    Q_OBJECT
 public:
     enum Difficulty {
         Easy,
@@ -20,11 +21,14 @@ public:
     };
     ModelTakuzu();
     void loadFile(const QString &name); // it will be private later
-
     void chooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
     void setRandomMap();
-    bool positionIsValid(int i, int j, Pawn pawn); // no const because we simulate the play so attributes are modified
     void playAt(int i, int j, Pawn pawn);
+    bool positionIsValid(int i, int j, Pawn pawn); // no const because we simulate the play so attributes are modified
+    void updateCount();
+    void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
+public slots:
+    void playAt(int i, int j);
 private: // private methods
     /**
      * @brief findFirstIdenticalRow
@@ -42,6 +46,14 @@ private: // attributes
     Difficulty _difficulty;
     char **_grids;
     char *_currentGrid;
+    struct {
+        char *_Wrow;
+        char *_Brow;
+        char *_Wcol;
+        char *_Bcol;
+    } _countPawn;
+
+
 };
 
 #endif // MODELTAKUZU_H
