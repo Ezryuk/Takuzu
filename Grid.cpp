@@ -1,4 +1,5 @@
 #include "Grid.h"
+#include <QDebug>
 
 
 Grid::Grid(QWidget *parent) : QWidget(parent)
@@ -68,5 +69,13 @@ void Grid::paintCount(bool isRow, int index, int black, int white)
         _painter->drawText(countArea, Qt::AlignCenter, QString::number(black) + " | " + QString::number(white));
     } else {
         _painter->drawText(countArea, Qt::AlignCenter, QString::number(black) + "\n | \n" + QString::number(white));
+    }
+}
+
+void Grid::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) {
+            int x = event->x();
+            qDebug() << QString::number(x);
     }
 }

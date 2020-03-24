@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPainter>
+#include <QMouseEvent>
 #include "ModelTakuzu.h"
 
 class QPaintEvent;
@@ -23,6 +24,7 @@ protected:
      * @param white number of white pawns
      */
     void paintCount(bool isRow, int index, int black, int white);
+    void mousePressEvent(QMouseEvent* event) override;
 
 signals:
 
