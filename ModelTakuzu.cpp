@@ -80,17 +80,17 @@ void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
     loadFile(QString(name));
 }
 
-void ModelTakuzu::setRandomMap()
+void ModelTakuzu::setMap(int chosenMap)
 {
     std::cout << "Nb maps: " << _nbMaps <<
                  " Size map: " << _sizeMap << "\n";
     assert((_nbMaps != -1 || _sizeMap != -1) && \
            "Choose a map pool before using setRandomMap().");
     delete _currentGrid; // _currentGrid allocated by setRandomMap() or nullptr
-    int randomGridIndex = (rand() % _nbMaps);
+
     _currentGrid = new char[_sizeMap * _sizeMap]();
     // load a fresh new grid in _current grid
-    memcpy(_currentGrid, _grids[randomGridIndex], sizeof(char) * _sizeMap * _sizeMap);
+    memcpy(_currentGrid, _grids[chosenMap], sizeof(char) * _sizeMap * _sizeMap);
 
     delete _countPawn._Wrow;
     delete _countPawn._Brow;
@@ -102,6 +102,13 @@ void ModelTakuzu::setRandomMap()
         new char[_sizeMap](),
         new char[_sizeMap]()
     };
+}
+
+int ModelTakuzu::setRandomMap()
+{
+    int randomGridIndex = (rand() % _nbMaps);
+    setMap(randomGridIndex);
+    return randomGridIndex;
 }
 
 void ModelTakuzu::playAt(int i, int j, Pawn pawn)
@@ -216,7 +223,7 @@ bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
     return result;
 }
 
-bool ModelTakuzu::rowIsValid(int i)
+bool ModelTakuzu::rowIsValid(int i) const
 {
     static auto forAll = [](bool tab[], int length) -> bool {
         for (int i = 0; i < length; ++i) {
@@ -232,7 +239,7 @@ bool ModelTakuzu::rowIsValid(int i)
             (_countPawn._Brow[i] == _countPawn._Wrow[i]);
 }
 
-bool ModelTakuzu::colIsValid(int j)
+bool ModelTakuzu::colIsValid(int j) const
 {
     static auto forAll = [](bool tab[], int length) -> bool {
         for (int i = 0; i < length; ++i) {

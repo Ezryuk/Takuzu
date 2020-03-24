@@ -22,7 +22,8 @@ public:
     ModelTakuzu();
     void loadFile(const QString &name); // it will be private later
     void chooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
-    void setRandomMap();
+    void setMap(int chosenMap);
+    int setRandomMap();
     void playAt(int i, int j, Pawn pawn);
     bool positionIsValid(int i, int j) const;
     /**
