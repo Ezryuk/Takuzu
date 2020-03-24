@@ -15,7 +15,7 @@ void Grid::paintEvent(QPaintEvent *)
     _painter->setPen(pen);
 
     int width = (QWidget::width()<QWidget::height())?QWidget::width():QWidget::height();
-    int widthRect = width/(_rows+2);
+    _widthRect = width/(_rows+2);
 
     _rects = new QRect*[_rows];
     _rowCount = new QRect[_rows];
@@ -24,11 +24,11 @@ void Grid::paintEvent(QPaintEvent *)
     for (int i = 0; i < _rows; ++i) {
         _rects[i] = new QRect[_rows];
         for (int j = 0; j < _rows; ++j) {
-            _rects[i][j] = QRect(i*widthRect, j*widthRect, widthRect, widthRect);
+            _rects[i][j] = QRect(i*_widthRect, j*_widthRect, _widthRect, _widthRect);
             _painter->drawRect(_rects[i][j]);
         }
-        _rowCount[i] = QRect(_rows*widthRect, i*widthRect, widthRect*2, widthRect);
-        _columnCount[i] = QRect(i*widthRect, _rows*widthRect, widthRect, widthRect*2);
+        _rowCount[i] = QRect(_rows*_widthRect, i*_widthRect, _widthRect*2, _widthRect);
+        _columnCount[i] = QRect(i*_widthRect, _rows*_widthRect, _widthRect, _widthRect*2);
         _painter->drawRect(_rowCount[i]);
         _painter->drawRect(_columnCount[i]);
     }
@@ -75,7 +75,13 @@ void Grid::paintCount(bool isRow, int index, int black, int white)
 void Grid::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
-            int x = event->x();
-            qDebug() << QString::number(x);
+            int x = event->x() / _widthRect;
+            int y = event->y() / _widthRect;
+            if (x < _rows) {
+                if (y < _rows) {
+                    qDebug() << QString::number(x);
+                    qDebug() << QString::number(y);
+                }
+            }
     }
 }

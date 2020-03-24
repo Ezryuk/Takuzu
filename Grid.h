@@ -32,6 +32,7 @@ public slots:
 
 private:
     int _rows = 8;
+    int _widthRect;
     QPainter * _painter;
     QRect** _rects;
     QRect* _rowCount;
