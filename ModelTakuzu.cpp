@@ -31,6 +31,19 @@ ModelTakuzu::ModelTakuzu()
     _countPawn = {nullptr, nullptr, nullptr, nullptr};
 }
 
+ModelTakuzu::~ModelTakuzu()
+{
+    for (int i = 0; i < _sizeMap; ++i) {
+        delete _grids[i];
+    }
+    delete _grids;
+    delete _currentGrid;
+    delete _countPawn._Wrow;
+    delete _countPawn._Brow;
+    delete _countPawn._Wcol;
+    delete _countPawn._Bcol;
+}
+
 void ModelTakuzu::loadFile(const QString &name)
 {
     QFile file(name);

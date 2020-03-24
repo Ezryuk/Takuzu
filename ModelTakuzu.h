@@ -20,6 +20,7 @@ public:
         Hard
     };
     ModelTakuzu();
+    ~ModelTakuzu();
     void loadFile(const QString &name); // it will be private later
     void chooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
     void setMap(int chosenMap);

@@ -1,20 +1,17 @@
-#include "MainWindow.h"
-#include "ModelTakuzu.h"
 #include <QApplication>
 
-
+#include "PresenterTakuzu.h"
 
 int main(int argc, char *argv[])
 {
     srand((unsigned)time(0));
     QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    ModelTakuzu *model = new ModelTakuzu();
-    model->chooseMapPool(ModelTakuzu::Easy, 6);
-    model->setRandomMap();
-    model->playAt(1, 2, Black);
-    model->positionIsValid(3, 5, White);
+    PresenterTakuzu *presenter = new PresenterTakuzu();
+
+    presenter->model->chooseMapPool(ModelTakuzu::Easy, 6);
+    presenter->model->setRandomMap();
+    presenter->model->playAt(1, 2, Black);
+    presenter->model->positionIsValid(3, 5, White);
     return a.exec();
 
 }
