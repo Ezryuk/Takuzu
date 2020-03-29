@@ -1,22 +1,25 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include <QInputDialog>
+#include <QTimer>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    _ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    _ui->setupUi(this);
 
-    connect(ui->newGame, SIGNAL(triggered()), this, SLOT(setNewGame()));
+    connect(_ui->newGame, SIGNAL(triggered()), this, SLOT(setNewGame()));
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete _ui;
 }
 
-void MainWindow::setNewGame() {
+void MainWindow::setNewGame()
+{
     int sizeMap;
     QString levelMap;
 
@@ -31,6 +34,21 @@ void MainWindow::setNewGame() {
         QString level = QInputDialog::getItem(this, "Choose difficulty level", "Level :", levels, 0, false, &ok);
         if (ok && !level.isEmpty()) {
             levelMap = level;
+            startChrono();
         }
     }
+}
+
+void MainWindow::startChrono()
+{
+    QTimer * chrono = new QTimer(this);
+    chrono->start(1000);
+    _time = new QTime;
+    _time->start();
+    connect(chrono, SIGNAL(timeout()), this, SLOT(chronoChanged()));
+}
+
+void MainWindow::chronoChanged()
+{
+    _ui->timeEdit->setTime(QTime(0,0).addMSecs(_time->elapsed()));
 }
