@@ -42,3 +42,6 @@ HEADERS += \
 
 FORMS += \
         MainWindow.ui
+
+RESOURCES += \
+    maps.qrc

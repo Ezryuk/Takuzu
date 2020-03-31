@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>6_easy.txt</file>
+        <file>6_hard.txt</file>
+        <file>8_easy.txt</file>
+        <file>8_hard.txt</file>
+        <file>10_easy.txt</file>
+        <file>10_hard.txt</file>
+    </qresource>
+</RCC>
