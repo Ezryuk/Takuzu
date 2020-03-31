@@ -2,7 +2,7 @@
 
 #include <QFile>
 #include <QIODevice>
-#include <QByteArray>
+#include <QTextStream>
 
 #include <iostream>
 #include <cstring>
@@ -48,11 +48,11 @@ void ModelTakuzu::loadFile(const QString &name)
 {
     QFile file(":/resources/"+name);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QByteArray line;
-
+        QString line;
+        QTextStream in(&file);
         // read number of grids in file
         bool ok = true;
-        _nbMaps = file.readLine().toInt(&ok);
+        _nbMaps = in.readLine().toInt(&ok);
         if (!ok) {
             std::cerr << "Issue when reading new line. \n"\
                       << "Make sure the file has the same path as the executable.\n";
@@ -72,8 +72,8 @@ void ModelTakuzu::loadFile(const QString &name)
         }
         {
             int i = 0;
-            while (!file.atEnd()) {
-                line = file.readLine();
+            while (!in.atEnd()) {
+                line = in.readLine();
                 memcpy(_grids[i++], line.constData(), sizeof(char) * _sizeMap * _sizeMap);
             }
         }
