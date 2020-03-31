@@ -5,7 +5,7 @@ PresenterTakuzu::PresenterTakuzu(QObject *parent) : QObject(parent)
     model = new ModelTakuzu();
     view = new MainWindow();
     view->show();
-    connect(view->getGrid(), SIGNAL(coordinatesClicked(int,int)), model, SLOT(playAt(int,int)));
+    connect(view->getGrid(), SIGNAL(notifyCoordinatesClicked(int,int)), model, SLOT(registerPlayAt(int,int)));
 
 }
 

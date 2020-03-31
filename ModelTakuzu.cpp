@@ -124,7 +124,7 @@ int ModelTakuzu::setRandomMap()
     return randomGridIndex;
 }
 
-void ModelTakuzu::playAt(int i, int j, Pawn pawn)
+void ModelTakuzu::registerPlayAt(int i, int j, Pawn pawn)
 {
         std::cout << "call playAt with params " << i << " and " << j << "\n";
     assert((_currentGrid != nullptr) && \
@@ -199,6 +199,11 @@ void ModelTakuzu::updateCount(int i, int j, Pawn oldPawn, Pawn newPawn)
             break;
         }
     }
+    emit notifyCount(i, j,
+                     _countPawn._Brow[i],
+                     _countPawn._Bcol[j],
+                     _countPawn._Wrow[i],
+                     _countPawn._Wcol[j]);
 }
 
 bool ModelTakuzu::positionIsValid(int i, int j) const
@@ -221,17 +226,18 @@ bool ModelTakuzu::positionIsValid(int i, int j) const
     int oneOtherIdenticalRow = findFirstIdenticalRow(i);
     int oneOtheerIdenticalCol = findFirstIdenticalCol(j);
 
-
-    return (!repetitionInRow &&
-            !repetitionInCol &&
-            (oneOtherIdenticalRow == _sizeMap) &&
-            (oneOtheerIdenticalCol == _sizeMap));
+    bool isValid = (!repetitionInRow &&
+                    !repetitionInCol &&
+                    (oneOtherIdenticalRow == _sizeMap) &&
+                    (oneOtheerIdenticalCol == _sizeMap));
+    emit notifyPositionIsValid(i, j, isValid);
+    return isValid;
 }
 
 bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
 {
     char oldPawn = _currentGrid[i * _sizeMap + j];
-    playAt(i, j, pawn); // simulate the play
+    registerPlayAt(i, j, pawn); // simulate the play
     bool result = positionIsValid(i, j);
     _currentGrid[i * _sizeMap + j] = oldPawn; // undo the simulation
     return result;
@@ -317,11 +323,18 @@ int ModelTakuzu::findFirstIdenticalCol(int j) const
 }
 
 
-void ModelTakuzu::playAt(int i, int j)
+void ModelTakuzu::registerPlayAt(int i, int j)
 {
-    playAt(i, j, TakuzuUtils::
-           permuteR(TakuzuUtils::
-                    toPawn(_currentGrid[i * _sizeMap + j])));
+    Pawn nextPawn = TakuzuUtils::
+            permuteR(TakuzuUtils::
+                     toPawn(_currentGrid[i * _sizeMap + j]));
+    registerPlayAt(i, j, nextPawn);
+    emit notifyNewPawn(i, j, nextPawn);
+}
+
+void ModelTakuzu::registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
+{
+    chooseMapPool(difficulty, size);
 }
 
 namespace TakuzuUtils {
