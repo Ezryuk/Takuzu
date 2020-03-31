@@ -16,7 +16,6 @@ public:
     ModelTakuzu *model;
     MainWindow *view;
 signals:
-
 public slots:
 private:
 };

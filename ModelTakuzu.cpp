@@ -126,6 +126,7 @@ int ModelTakuzu::setRandomMap()
 
 void ModelTakuzu::playAt(int i, int j, Pawn pawn)
 {
+        std::cout << "call playAt with params " << i << " and " << j << "\n";
     assert((_currentGrid != nullptr) && \
            "Set a map using setRandomMap() before calling playAt().");
     // we could create a map (pawn=>letter) but for 3 elements, not necessary

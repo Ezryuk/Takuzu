@@ -15,7 +15,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     void startChrono();
     ~MainWindow();
-
+    QWidget *getGrid() const;
 public slots:
     void setNewGame();
     void chronoChanged();

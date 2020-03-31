@@ -18,6 +18,11 @@ MainWindow::~MainWindow()
     delete _ui;
 }
 
+QWidget *MainWindow::getGrid() const
+{
+    return _ui->gridWidget;
+}
+
 void MainWindow::setNewGame()
 {
     int sizeMap;
