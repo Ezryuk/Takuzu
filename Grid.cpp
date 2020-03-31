@@ -89,3 +89,14 @@ void Grid::setRows(int rows)
 {
     _rows = rows;
 }
+
+void Grid::registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol)
+{
+
+}
+
+void Grid::registerPositionIsValid(int i, int j, bool isValid) const
+{
+
+}
+
