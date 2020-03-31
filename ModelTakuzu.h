@@ -21,11 +21,12 @@ public:
     };
     ModelTakuzu();
     ~ModelTakuzu();
+private:
     void loadFile(const QString &name); // it will be private later
     void chooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
     void setMap(int chosenMap);
     int setRandomMap();
-    void playAt(int i, int j, Pawn pawn);
+    void registerPlayAt(int i, int j, Pawn pawn);
     bool positionIsValid(int i, int j) const;
     /**
      * @brief positionIsValid \
@@ -41,8 +42,13 @@ public:
     void updateCount();
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
 
+signals:
+    void notifyNewPawn(int i, int j, Pawn newPawn);
+    void notifyCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
+    void notifyPositionIsValid(int i, int j, bool isValid) const;
 public slots:
-    void playAt(int i, int j);
+    void registerPlayAt(int i, int j);
+    void registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
 
 public: // public "attributes". Replace getter + setter
     char *_currentGrid;

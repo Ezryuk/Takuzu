@@ -199,6 +199,11 @@ void ModelTakuzu::updateCount(int i, int j, Pawn oldPawn, Pawn newPawn)
             break;
         }
     }
+    emit notifyCount(i, j,
+                     _countPawn._Brow[i],
+                     _countPawn._Bcol[j],
+                     _countPawn._Wrow[i],
+                     _countPawn._Wcol[j]);
 }
 
 bool ModelTakuzu::positionIsValid(int i, int j) const
@@ -221,11 +226,12 @@ bool ModelTakuzu::positionIsValid(int i, int j) const
     int oneOtherIdenticalRow = findFirstIdenticalRow(i);
     int oneOtheerIdenticalCol = findFirstIdenticalCol(j);
 
-
-    return (!repetitionInRow &&
-            !repetitionInCol &&
-            (oneOtherIdenticalRow == _sizeMap) &&
-            (oneOtheerIdenticalCol == _sizeMap));
+    bool isValid = (!repetitionInRow &&
+                    !repetitionInCol &&
+                    (oneOtherIdenticalRow == _sizeMap) &&
+                    (oneOtheerIdenticalCol == _sizeMap));
+    emit notifyPositionIsValid(i, j, isValid);
+    return isValid;
 }
 
 bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
@@ -319,9 +325,16 @@ int ModelTakuzu::findFirstIdenticalCol(int j) const
 
 void ModelTakuzu::playAt(int i, int j)
 {
-    playAt(i, j, TakuzuUtils::
-           permuteR(TakuzuUtils::
-                    toPawn(_currentGrid[i * _sizeMap + j])));
+    Pawn nextPawn = TakuzuUtils::
+            permuteR(TakuzuUtils::
+                     toPawn(_currentGrid[i * _sizeMap + j]));
+    playAt(i, j, nextPawn);
+    emit notifyNewPawn(i, j, nextPawn);
+}
+
+void ModelTakuzu::difficultyAndSizeChosen(ModelTakuzu::Difficulty difficulty, int size)
+{
+    chooseMapPool(difficulty, size);
 }
 
 namespace TakuzuUtils {

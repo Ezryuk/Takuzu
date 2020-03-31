@@ -27,7 +27,7 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
 
 signals:
-    void coordinatesClicked(int x,int y);
+    void notifyCoordinatesClicked(int x,int y);
 
 public slots:
 
