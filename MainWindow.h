@@ -16,9 +16,13 @@ public:
     void startChrono();
     ~MainWindow();
     QWidget *getGrid() const;
+
+signals:
+    void notifyMapChosen(QString size, QString level);
+
 public slots:
-    void setNewGame();
-    void chronoChanged();
+    void registerSetNewGame();
+    void registerChronoChanged();
 
 private:
     Ui::MainWindow *_ui;

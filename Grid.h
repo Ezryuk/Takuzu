@@ -13,6 +13,7 @@ class Grid : public QWidget
     Q_OBJECT
 public:
     explicit Grid(QWidget *parent = nullptr);
+    void setRows(int rows);
 
 protected:
     void paintEvent(QPaintEvent *) override;
@@ -27,12 +28,14 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
 
 signals:
-    void coordinatesClicked(int x,int y);
+    void coordinatesClicked(int x,int y) const;
 
 public slots:
+    void registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
+    void registerPositionIsValid(int i, int j, bool isValid) const;
 
 private:
-    int _rows = 8;
+    int _rows = 0;
     int _widthRect;
     QPainter * _painter;
     QRect** _rects;

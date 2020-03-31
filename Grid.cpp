@@ -84,3 +84,8 @@ void Grid::mousePressEvent(QMouseEvent* event)
             }
     }
 }
+
+void Grid::setRows(int rows)
+{
+    _rows = rows;
+}
