@@ -124,7 +124,7 @@ int ModelTakuzu::setRandomMap()
     return randomGridIndex;
 }
 
-void ModelTakuzu::playAt(int i, int j, Pawn pawn)
+void ModelTakuzu::registerPlayAt(int i, int j, Pawn pawn)
 {
         std::cout << "call playAt with params " << i << " and " << j << "\n";
     assert((_currentGrid != nullptr) && \
@@ -237,7 +237,7 @@ bool ModelTakuzu::positionIsValid(int i, int j) const
 bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
 {
     char oldPawn = _currentGrid[i * _sizeMap + j];
-    playAt(i, j, pawn); // simulate the play
+    registerPlayAt(i, j, pawn); // simulate the play
     bool result = positionIsValid(i, j);
     _currentGrid[i * _sizeMap + j] = oldPawn; // undo the simulation
     return result;
@@ -323,16 +323,16 @@ int ModelTakuzu::findFirstIdenticalCol(int j) const
 }
 
 
-void ModelTakuzu::playAt(int i, int j)
+void ModelTakuzu::registerPlayAt(int i, int j)
 {
     Pawn nextPawn = TakuzuUtils::
             permuteR(TakuzuUtils::
                      toPawn(_currentGrid[i * _sizeMap + j]));
-    playAt(i, j, nextPawn);
+    registerPlayAt(i, j, nextPawn);
     emit notifyNewPawn(i, j, nextPawn);
 }
 
-void ModelTakuzu::difficultyAndSizeChosen(ModelTakuzu::Difficulty difficulty, int size)
+void ModelTakuzu::registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
 {
     chooseMapPool(difficulty, size);
 }

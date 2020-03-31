@@ -79,7 +79,7 @@ void Grid::mousePressEvent(QMouseEvent* event)
             int y = event->y() / _widthRect;
             if (x < _rows) {
                 if (y < _rows) {
-                    emit coordinatesClicked(x,y);
+                    emit notifyCoordinatesClicked(x,y);
                 }
             }
     }
