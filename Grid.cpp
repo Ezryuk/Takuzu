@@ -79,8 +79,7 @@ void Grid::mousePressEvent(QMouseEvent* event)
             int y = event->y() / _widthRect;
             if (x < _rows) {
                 if (y < _rows) {
-                    qDebug() << QString::number(x);
-                    qDebug() << QString::number(y);
+                    emit coordinatesClicked(x,y);
                 }
             }
     }

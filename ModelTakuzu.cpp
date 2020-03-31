@@ -46,7 +46,7 @@ ModelTakuzu::~ModelTakuzu()
 
 void ModelTakuzu::loadFile(const QString &name)
 {
-    QFile file("qrc:/resources/"+name);
+    QFile file(":/resources/"+name);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QByteArray line;
 
