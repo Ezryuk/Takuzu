@@ -1,7 +1,6 @@
 #include "Grid.h"
 #include <QDebug>
 
-
 Grid::Grid(QWidget *parent) : QWidget(parent)
 {
 
@@ -18,8 +17,8 @@ void Grid::paintEvent(QPaintEvent *)
     _widthRect = width/(_rows+2);
 
     _rects = new QRect*[_rows];
-    _rowCount = new QRect[_rows];
-    _columnCount = new QRect[_rows];
+    _rowCountArea = new QRect[_rows];
+    _columnCountArea = new QRect[_rows];
 
     for (int i = 0; i < _rows; ++i) {
         _rects[i] = new QRect[_rows];
@@ -27,10 +26,17 @@ void Grid::paintEvent(QPaintEvent *)
             _rects[i][j] = QRect(i*_widthRect, j*_widthRect, _widthRect, _widthRect);
             _painter->drawRect(_rects[i][j]);
         }
-        _rowCount[i] = QRect(_rows*_widthRect, i*_widthRect, _widthRect*2, _widthRect);
-        _columnCount[i] = QRect(i*_widthRect, _rows*_widthRect, _widthRect, _widthRect*2);
-        _painter->drawRect(_rowCount[i]);
-        _painter->drawRect(_columnCount[i]);
+        _rowCountArea[i] = QRect(_rows*_widthRect, i*_widthRect, _widthRect*2, _widthRect);
+        _columnCountArea[i] = QRect(i*_widthRect, _rows*_widthRect, _widthRect, _widthRect*2);
+        _painter->drawRect(_rowCountArea[i]);
+        _painter->drawRect(_columnCountArea[i]);
+    }
+    for (int i = 0; i < _rows; i++) {
+        paintCount(true, i, _rowCounts[i*2], _rowCounts[i*2+1]);
+        paintCount(false, i, _colCounts[i*2], _colCounts[i*2+1]);
+        for (int j = 0; j < _rows; j++) {
+            paintPawn(i, j, _pawns[i*_rows+j]);
+        }
     }
     _painter->end();
 }
@@ -40,15 +46,15 @@ void Grid::paintPawn(int row, int column, Pawn p) {
     int width = rect.width()/2-2;
     QPoint center(rect.center().x()+2, rect.center().y()+2);
     switch(p) {
-    case Pawn::Black:
+    case Black:
         _painter->setBrush(Qt::black);
         _painter->drawEllipse(center, width, width);
         break;
-    case Pawn::White:
+    case White:
         _painter->setBrush(Qt::white);
         _painter->drawEllipse(center, width, width);
         break;
-    case Pawn::Empty:
+    case Empty:
         _painter->eraseRect(rect.x()+2, rect.y()+2, rect.width()-2, rect.height()-2);
         break;
     }
@@ -58,9 +64,9 @@ void Grid::paintCount(bool isRow, int index, int black, int white)
 {
     QRect countArea;
     if (isRow) {
-        countArea = _rowCount[index];
+        countArea = _rowCountArea[index];
     } else {
-        countArea = _columnCount[index];
+        countArea = _columnCountArea[index];
     }
 
     if (black == _rows/2 && white == _rows/2) {
@@ -68,7 +74,7 @@ void Grid::paintCount(bool isRow, int index, int black, int white)
     } else if (isRow) {
         _painter->drawText(countArea, Qt::AlignCenter, QString::number(black) + " | " + QString::number(white));
     } else {
-        _painter->drawText(countArea, Qt::AlignCenter, QString::number(black) + "\n | \n" + QString::number(white));
+        _painter->drawText(countArea, Qt::AlignCenter, QString::number(black) + "\n - \n" + QString::number(white));
     }
 }
 
@@ -88,11 +94,23 @@ void Grid::mousePressEvent(QMouseEvent* event)
 void Grid::setRows(int rows)
 {
     _rows = rows;
+    _rowCounts = new int[_rows*2]();
+    _colCounts = new int[_rows*2]();
+    _pawns = new Pawn[_rows*_rows];
+    for (int i = 0; i < _rows*_rows; i++) {
+        _pawns[i] = Empty;
+    }
+    repaint();
 }
 
 void Grid::registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol)
 {
-
+    if (_rows != 0) {
+        _rowCounts[i*2] = Brow;
+        _rowCounts[i*2+1] = Wrow;
+        _colCounts[j*2] = Bcol;
+        _colCounts[j*2+1] = Wcol;
+    }
 }
 
 void Grid::registerPositionIsValid(int i, int j, bool isValid) const

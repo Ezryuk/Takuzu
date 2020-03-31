@@ -39,8 +39,11 @@ private:
     int _widthRect;
     QPainter * _painter;
     QRect** _rects;
-    QRect* _rowCount;
-    QRect* _columnCount;
+    QRect* _rowCountArea;
+    QRect* _columnCountArea;
+    int* _rowCounts;
+    int* _colCounts;
+    Pawn* _pawns;
 };
 
 #endif // GRID_H
