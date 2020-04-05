@@ -15,6 +15,7 @@ void Grid::paintEvent(QPaintEvent *)
 
     int width = (QWidget::width()<QWidget::height())?QWidget::width():QWidget::height();
     _widthRect = width/(_rows+2);
+    _margin = (QWidget::width()-width+2*_widthRect)/2;
 
     _rects = new QRect*[_rows];
     _rowCountArea = new QRect[_rows];
@@ -23,13 +24,14 @@ void Grid::paintEvent(QPaintEvent *)
     for (int i = 0; i < _rows; ++i) {
         _rects[i] = new QRect[_rows];
         for (int j = 0; j < _rows; ++j) {
-            _rects[i][j] = QRect(i*_widthRect, j*_widthRect, _widthRect, _widthRect);
+            _rects[i][j] = QRect(i*_widthRect+_margin, j*_widthRect, _widthRect, _widthRect);
             _painter->drawRect(_rects[i][j]);
         }
-        _rowCountArea[i] = QRect(_rows*_widthRect, i*_widthRect, _widthRect*2, _widthRect);
-        _columnCountArea[i] = QRect(i*_widthRect, _rows*_widthRect, _widthRect, _widthRect*2);
-        _painter->drawRect(_rowCountArea[i]);
-        _painter->drawRect(_columnCountArea[i]);
+        _rowCountArea[i] = QRect(_rows*_widthRect+_margin, i*_widthRect, _widthRect*2, _widthRect);
+        _columnCountArea[i] = QRect(i*_widthRect+_margin, _rows*_widthRect, _widthRect, _widthRect*2);
+    }
+    if (!_valid) {
+        _painter->fillRect(_rects[_invalidSquare.x()][_invalidSquare.y()], QBrush(Qt::red));
     }
     for (int i = 0; i < _rows; i++) {
         paintCount(true, i, _rowCounts[i*2], _rowCounts[i*2+1]);
@@ -81,9 +83,9 @@ void Grid::paintCount(bool isRow, int index, int black, int white)
 void Grid::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
-            int x = event->x() / _widthRect;
+            int x = (event->x()-_margin) / _widthRect;
             int y = event->y() / _widthRect;
-            if (x < _rows) {
+            if (x < _rows && event->x()-_margin > 0) {
                 if (y < _rows) {
                     emit notifyCoordinatesClicked(x,y);
                 }
@@ -113,8 +115,12 @@ void Grid::registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol)
     }
 }
 
-void Grid::registerPositionIsValid(int i, int j, bool isValid) const
+void Grid::registerPositionIsValid(int i, int j, bool isValid)
 {
-
+    if (_rows != 0) {
+        _valid = isValid;
+        _invalidSquare.setX(i);
+        _invalidSquare.setY(j);
+    }
 }
 

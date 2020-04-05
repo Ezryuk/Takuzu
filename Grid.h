@@ -32,11 +32,12 @@ signals:
 
 public slots:
     void registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
-    void registerPositionIsValid(int i, int j, bool isValid) const;
+    void registerPositionIsValid(int i, int j, bool isValid);
 
 private:
     int _rows = 0;
     int _widthRect;
+    int _margin;
     QPainter * _painter;
     QRect** _rects;
     QRect* _rowCountArea;
@@ -44,6 +45,8 @@ private:
     int* _rowCounts;
     int* _colCounts;
     Pawn* _pawns;
+    bool _valid = true;
+    QPoint _invalidSquare;
 };
 
 #endif // GRID_H
