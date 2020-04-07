@@ -18,6 +18,7 @@ ModelTakuzu::ModelTakuzu()
     _grids = nullptr;
     _currentGrid = nullptr;
     _countPawn = {nullptr, nullptr, nullptr, nullptr};
+    _chosenMap = -1;
 }
 
 ModelTakuzu::~ModelTakuzu()
@@ -82,7 +83,7 @@ void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
     loadFile(QString(name));
 }
 
-void ModelTakuzu::setMap(int chosenMap)
+int ModelTakuzu::setMap(int chosenMap)
 {
     std::cout << "Nb maps: " << _nbMaps <<
                  " Size map: " << _sizeMap << "\n";
@@ -94,6 +95,7 @@ void ModelTakuzu::setMap(int chosenMap)
     // load a fresh new grid in _current grid
     memcpy(_currentGrid, _grids[chosenMap], sizeof(char) * _sizeMap * _sizeMap);
 
+
     delete _countPawn._Wrow;
     delete _countPawn._Brow;
     delete _countPawn._Wcol;
@@ -104,12 +106,18 @@ void ModelTakuzu::setMap(int chosenMap)
         new char[_sizeMap](),
         new char[_sizeMap]()
     };
+    for(int i = 0; i < _sizeMap; ++i) {
+        for (int j = 0; j < _sizeMap; ++j) {
+            emit notifyInitialPawn(i, j, TakuzuUtils::toPawn(_grids[chosenMap][i * _sizeMap + j]));
+        }
+    }
+    return chosenMap;
 }
 
 int ModelTakuzu::setRandomMap()
 {
     int randomGridIndex = (rand() % _nbMaps);
-    setMap(randomGridIndex);
+    _chosenMap = setMap(randomGridIndex);
     return randomGridIndex;
 }
 
@@ -138,6 +146,7 @@ void ModelTakuzu::playAt(int i, int j, Pawn pawn)
     Pawn newPawn = pawn;
     updateCount(i, j, oldPawn, newPawn);
     _currentGrid[i * _sizeMap + j] = c;
+    emit notifyNewPawn(i, j, pawn);
 
 }
 
@@ -323,7 +332,6 @@ void ModelTakuzu::registerPlayAt(int i, int j)
             permuteR(TakuzuUtils::
                      toPawn(_currentGrid[i * _sizeMap + j]));
     playAt(i, j, nextPawn);
-    emit notifyNewPawn(i, j, nextPawn);
 }
 
 void ModelTakuzu::registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size)

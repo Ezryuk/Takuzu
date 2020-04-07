@@ -37,7 +37,7 @@ public:
     ~ModelTakuzu();
     void loadFile(const QString &name); // it will be private later
     void chooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
-    void setMap(int chosenMap);
+    int setMap(int chosenMap);
     int setRandomMap();
     void playAt(int i, int j, Pawn pawn);
     bool positionIsValid(int i, int j) const;
@@ -59,6 +59,7 @@ signals:
     void notifyNewPawn(int i, int j, Pawn newPawn);
     void notifyCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
     void notifyPositionIsValid(int i, int j, bool isValid) const;
+    void notifyInitialPawn(int i, int j, Pawn readOnlyPawn);
 public slots:
     void registerPlayAt(int i, int j);
     void registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
@@ -88,6 +89,7 @@ private: // attributes
     int _sizeMap;
     Difficulty _difficulty;
     char **_grids;
+    int _chosenMap;
 
 };
 
