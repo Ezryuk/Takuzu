@@ -94,7 +94,9 @@ void Grid::mousePressEvent(QMouseEvent* event)
             int y = event->y() / _widthRect;
             if (x < _rows && event->x()-_margin > 0) {
                 if (y < _rows) {
-                    emit notifyCoordinatesClicked(x,y);
+                    if (!_initPawns[x*_rows+y]) {
+                        emit notifyCoordinatesClicked(x,y);
+                    }
                 }
             }
     }
@@ -133,7 +135,7 @@ void Grid::registerPositionIsValid(int i, int j, bool isValid)
 
 void Grid::registerInitialPawn(int i, int j, Pawn p)
 {
-    if (p == Empty) {
+    if (p != Empty) {
         _initPawns[i*_rows+j] = true;
     }
     _pawns[i*_rows+j] = p;
