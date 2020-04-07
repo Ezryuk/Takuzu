@@ -48,11 +48,11 @@ void ModelTakuzu::loadFile(const QString &name)
                       << "Make sure the file has the same path as the executable.\n";
         }
 
-        // get size of grid
-        _sizeMap = name.at(0).digitValue();
-        if (_sizeMap == -1) {
-            std::cerr << "Issue when reading size of map. \n";
-        }
+//        // get size of grid
+//        _sizeMap = name.at(0).digitValue();
+//        if (_sizeMap == -1) {
+//            std::cerr << "Issue when reading size of map. \n";
+//        }
 
         // read each map in separate line until EOF
         // char **_grids;
@@ -70,6 +70,7 @@ void ModelTakuzu::loadFile(const QString &name)
     } else {
         std::cerr << "Error while opening new file: " << name.toStdString() << " .\n";
     }
+    setRandomMap();
 }
 
 void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
@@ -80,6 +81,8 @@ void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
     } else /* (difficulty == Hard) */ {
         name.append("_hard.txt");
     }
+    _difficulty = difficulty;
+    _sizeMap = size;
     loadFile(QString(name));
 }
 
@@ -147,12 +150,15 @@ void ModelTakuzu::playAt(int i, int j, Pawn pawn)
     updateCount(i, j, oldPawn, newPawn);
     _currentGrid[i * _sizeMap + j] = c;
     emit notifyNewPawn(i, j, pawn);
-
 }
 
 
 void ModelTakuzu::updateCount()
 {
+    memset(_countPawn._Brow, 0, _sizeMap * sizeof(char));
+    memset(_countPawn._Bcol, 0, _sizeMap * sizeof(char));
+    memset(_countPawn._Wrow, 0, _sizeMap * sizeof(char));
+    memset(_countPawn._Wcol, 0, _sizeMap * sizeof(char));
     for (int i = 0; i < _sizeMap * _sizeMap; ++i) {
         switch (_currentGrid[i]) {
         case 'B':
@@ -227,12 +233,12 @@ bool ModelTakuzu::positionIsValid(int i, int j) const
     bool repetitionInRow = TakuzuUtils::isBBBorWWWpresentIn(rowToScan);
     bool repetitionInCol = TakuzuUtils::isBBBorWWWpresentIn(colToScan);
     int oneOtherIdenticalRow = findFirstIdenticalRow(i);
-    int oneOtheerIdenticalCol = findFirstIdenticalCol(j);
+    int oneOtherIdenticalCol = findFirstIdenticalCol(j);
 
     bool isValid = (!repetitionInRow &&
                     !repetitionInCol &&
                     (oneOtherIdenticalRow == _sizeMap) &&
-                    (oneOtheerIdenticalCol == _sizeMap));
+                    (oneOtherIdenticalCol == _sizeMap));
     emit notifyPositionIsValid(i, j, isValid);
     return isValid;
 }
@@ -343,9 +349,9 @@ namespace TakuzuUtils {
 
 bool isBBBorWWWpresentIn(char *strToScan) {
     std::cout << "strToScan: " << strToScan << "\n";
-    char *occurencePointerWWW = strstr(strToScan, "WWW");
+    char *occurrencePointerWWW = strstr(strToScan, "WWW");
     char *occurrencePointerBBB = strstr(strToScan, "BBB");
-    return (occurencePointerWWW != NULL || occurrencePointerBBB != NULL);
+    return (occurrencePointerWWW != NULL || occurrencePointerBBB != NULL);
 }
 
 Pawn permuteR(Pawn p) {
