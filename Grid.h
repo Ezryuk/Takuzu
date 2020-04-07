@@ -40,7 +40,8 @@ private:
     int _rows = 0;
     int _widthRect;
     int _margin;
-    QPainter * _painter;
+    QPen* _pen;
+    QPainter* _painter;
     QRect** _rects;
     QRect* _rowCountArea;
     QRect* _columnCountArea;

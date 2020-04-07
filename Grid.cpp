@@ -9,17 +9,17 @@ Grid::Grid(QWidget *parent) : QWidget(parent)
 void Grid::paintEvent(QPaintEvent *)
 {
     _painter = new QPainter(this);
-    QPen pen(Qt::black);
-    pen.setWidth(3);
-    _painter->setPen(pen);
+    _pen = new QPen(Qt::black);
+    _pen->setWidth(3);
+    _painter->setPen(*_pen);
 
     int width = (QWidget::width()<QWidget::height())?QWidget::width():QWidget::height();
     _widthRect = width/(_rows+2);
     _margin = (QWidget::width()-width+2*_widthRect)/2;
 
     _rects = new QRect*[_rows];
-    _rowCountArea = new QRect[_rows];
-    _columnCountArea = new QRect[_rows];
+    _rowCountArea = new QRect[_rows*2];
+    _columnCountArea = new QRect[_rows*2];
 
     for (int i = 0; i < _rows; ++i) {
         _rects[i] = new QRect[_rows];
@@ -27,8 +27,10 @@ void Grid::paintEvent(QPaintEvent *)
             _rects[i][j] = QRect(i*_widthRect+_margin, j*_widthRect, _widthRect, _widthRect);
             _painter->drawRect(_rects[i][j]);
         }
-        _rowCountArea[i] = QRect(_rows*_widthRect+_margin, i*_widthRect, _widthRect*2, _widthRect);
-        _columnCountArea[i] = QRect(i*_widthRect+_margin, _rows*_widthRect, _widthRect, _widthRect*2);
+        _rowCountArea[i*2] = QRect(_rows*_widthRect+_margin, i*_widthRect, _widthRect, _widthRect);
+        _columnCountArea[i*2] = QRect(i*_widthRect+_margin, _rows*_widthRect, _widthRect, _widthRect);
+        _rowCountArea[i*2+1] = QRect((_rows+1)*_widthRect+_margin, i*_widthRect, _widthRect, _widthRect);
+        _columnCountArea[i*2+1] = QRect(i*_widthRect+_margin, (_rows+1)*_widthRect, _widthRect, _widthRect);
     }
     if (!_valid) {
         _painter->fillRect(_rects[_invalidSquare.x()][_invalidSquare.y()], QBrush(Qt::red));
@@ -61,29 +63,40 @@ void Grid::paintPawn(int row, int column, Pawn p) {
         break;
     }
     if (_initPawns[row*_rows+column]) {
-        _painter->setPen(Qt::red);
+        QPen penInit(Qt::red);
+        penInit.setWidth(3);
+        _painter->setPen(penInit);
         _painter->drawEllipse(center, width, width);
-        QPen pen(Qt::black);
-        pen.setWidth(3);
-        _painter->setPen(pen);
+        _painter->setPen(*_pen);
     }
 }
 
 void Grid::paintCount(bool isRow, int index, int black, int white)
 {
-    QRect countArea;
+    QRect countAreaBlack;
+    QRect countAreaWhite;
     if (isRow) {
-        countArea = _rowCountArea[index];
+        countAreaBlack = _rowCountArea[index*2];
+        countAreaWhite = _rowCountArea[index*2+1];
     } else {
-        countArea = _columnCountArea[index];
+        countAreaBlack = _columnCountArea[index*2];
+        countAreaWhite = _columnCountArea[index*2+1];
     }
 
     if (black == _rows/2 && white == _rows/2) {
-        _painter->drawText(countArea, Qt::AlignCenter, "OK");
-    } else if (isRow) {
-        _painter->drawText(countArea, Qt::AlignCenter, QString::number(black) + " | " + QString::number(white));
+        _painter->fillRect(countAreaBlack, Qt::green);
+        _painter->fillRect(countAreaWhite, Qt::green);
+        _painter->drawText(countAreaBlack, Qt::AlignCenter, "O");
+        _painter->drawText(countAreaWhite, Qt::AlignCenter, "K");
     } else {
-        _painter->drawText(countArea, Qt::AlignCenter, QString::number(black) + "\n - \n" + QString::number(white));
+        _painter->fillRect(countAreaBlack, Qt::black);
+        _painter->fillRect(countAreaWhite, Qt::white);
+        QPen penWhite(Qt::white);
+        penWhite.setWidth(3);
+        _painter->setPen(penWhite);
+        _painter->drawText(countAreaBlack, Qt::AlignCenter, QString::number(black));
+        _painter->setPen(*_pen);
+        _painter->drawText(countAreaWhite, Qt::AlignCenter, QString::number(white));
     }
 }
 
@@ -95,7 +108,7 @@ void Grid::mousePressEvent(QMouseEvent* event)
             if (x < _rows && event->x()-_margin > 0) {
                 if (y < _rows) {
                     if (!_initPawns[x*_rows+y]) {
-                        emit notifyCoordinatesClicked(x,y);
+                        emit notifyCoordinatesClicked(y,x);
                     }
                 }
             }
@@ -118,10 +131,10 @@ void Grid::setRows(int rows)
 
 void Grid::registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol)
 {
-    _rowCounts[j*2] = Brow;
-    _rowCounts[j*2+1] = Wrow;
-    _colCounts[i*2] = Bcol;
-    _colCounts[i*2+1] = Wcol;
+    _rowCounts[i*2] = Brow;
+    _rowCounts[i*2+1] = Wrow;
+    _colCounts[j*2] = Bcol;
+    _colCounts[j*2+1] = Wcol;
     repaint();
 }
 
@@ -136,15 +149,15 @@ void Grid::registerPositionIsValid(int i, int j, bool isValid)
 void Grid::registerInitialPawn(int i, int j, Pawn p)
 {
     if (p != Empty) {
-        _initPawns[i*_rows+j] = true;
+        _initPawns[j*_rows+i] = true;
     }
-    _pawns[i*_rows+j] = p;
+    _pawns[j*_rows+i] = p;
     repaint();
 }
 
 void Grid::registerNewPawn(int i, int j, Pawn p)
 {
-    _pawns[i*_rows+j] = p;
+    _pawns[j*_rows+i] = p;
     repaint();
 }
 
