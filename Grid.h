@@ -32,9 +32,10 @@ signals:
 
 public slots:
     void registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
-    void registerPositionIsValid(int i, int j, bool isValid);
     void registerInitialPawn(int i, int j, Pawn p);
     void registerNewPawn(int i, int j, Pawn p);
+    void registerOverThreeAdjacentPawns(int index, bool isVertical, bool isOk);
+    void registerCommonPatterns(int first, int second, bool isVertical, bool isOK);
 
 private:
     int _rows = 0;
@@ -49,8 +50,8 @@ private:
     int* _colCounts;
     bool* _initPawns;
     Pawn* _pawns;
-    bool _valid = true;
-    QPoint _invalidSquare;
+    bool* _invalidVertical;
+    bool* _invalidHorizontal;
 };
 
 #endif // GRID_H

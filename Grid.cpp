@@ -32,9 +32,38 @@ void Grid::paintEvent(QPaintEvent *)
         _rowCountArea[i*2+1] = QRect((_rows+1)*_widthRect+_margin, i*_widthRect, _widthRect, _widthRect);
         _columnCountArea[i*2+1] = QRect(i*_widthRect+_margin, (_rows+1)*_widthRect, _widthRect, _widthRect);
     }
-    if (!_valid) {
-        _painter->fillRect(_rects[_invalidSquare.x()][_invalidSquare.y()], QBrush(Qt::red));
+
+    // Erases valid rows before drawing in red invalid rows
+    QRect rect;
+    for (int i = 0; i < _rows; i++) {
+        if (!_invalidHorizontal[i]) {
+            for (int j = 0; j < _rows; j++) {
+                rect = _rects[j][i];
+                _painter->eraseRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3);
+            }
+        }
+        if (!_invalidVertical[i]) {
+            for (int j = 0; j < _rows; j++) {
+                rect = _rects[i][j];
+                _painter->eraseRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3);
+            }
+        }    
     }
+    for (int i = 0; i < _rows; i++) {
+        if (_invalidHorizontal[i]) {
+            for (int j = 0; j < _rows; j++) {
+                rect = _rects[j][i];
+                _painter->fillRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3, QBrush(Qt::red));
+            }
+        }
+        if (_invalidVertical[i]) {
+            for (int j = 0; j < _rows; j++) {
+                rect = _rects[i][j];
+                _painter->fillRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3, QBrush(Qt::red));
+            }
+        }
+    }
+
     for (int i = 0; i < _rows; i++) {
         paintCount(true, i, _rowCounts[i*2], _rowCounts[i*2+1]);
         paintCount(false, i, _colCounts[i*2], _colCounts[i*2+1]);
@@ -47,8 +76,8 @@ void Grid::paintEvent(QPaintEvent *)
 
 void Grid::paintPawn(int row, int column, Pawn p) {
     QRect rect = _rects[row][column];
-    int width = rect.width()/2-2;
-    QPoint center(rect.center().x()+2, rect.center().y()+2);
+    int width = rect.width()/2-3;
+    QPoint center(rect.center().x()+1.8, rect.center().y()+1.8);
     switch(p) {
     case Black:
         _painter->setBrush(Qt::black);
@@ -59,11 +88,11 @@ void Grid::paintPawn(int row, int column, Pawn p) {
         _painter->drawEllipse(center, width, width);
         break;
     case Empty:
-        _painter->eraseRect(rect.x()+2, rect.y()+2, rect.width()-2, rect.height()-2);
+        _painter->eraseRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3);
         break;
     }
     if (_initPawns[row*_rows+column]) {
-        QPen penInit(Qt::red);
+        QPen penInit(Qt::blue);
         penInit.setWidth(3);
         _painter->setPen(penInit);
         _painter->drawEllipse(center, width, width);
@@ -122,10 +151,18 @@ void Grid::setRows(int rows)
     _colCounts = new int[_rows*2]();
     _initPawns = new bool[_rows*_rows];
     _pawns = new Pawn[_rows*_rows];
-    for (int i = 0; i < _rows*_rows; i++) {
-        _initPawns[i] = false;
-        _pawns[i] = Empty;
+    _invalidHorizontal = new bool[_rows];
+    _invalidVertical = new bool[_rows];
+
+    for (int i = 0; i < _rows; i++) {
+        _invalidHorizontal[i] = false;
+        _invalidVertical[i] = false;
+        for (int j = 0; j < _rows; j++) {
+            _initPawns[i*_rows+j] = false;
+            _pawns[i*_rows+j] = Empty;
+        }
     }
+
     repaint();
 }
 
@@ -135,14 +172,6 @@ void Grid::registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol)
     _rowCounts[i*2+1] = Wrow;
     _colCounts[j*2] = Bcol;
     _colCounts[j*2+1] = Wcol;
-    repaint();
-}
-
-void Grid::registerPositionIsValid(int i, int j, bool isValid)
-{
-    _valid = isValid;
-    _invalidSquare.setX(i);
-    _invalidSquare.setY(j);
     repaint();
 }
 
@@ -159,5 +188,20 @@ void Grid::registerNewPawn(int i, int j, Pawn p)
 {
     _pawns[j*_rows+i] = p;
     repaint();
+}
+
+void Grid::registerOverThreeAdjacentPawns(int index, bool isVertical, bool isOk)
+{
+    qDebug() << isOk;
+    if (isVertical) {
+        _invalidVertical[index] = !isOk;
+    } else {
+        _invalidHorizontal[index] = !isOk;
+    }
+}
+
+void Grid::registerCommonPatterns(int first, int second, bool isVertical, bool isOK)
+{
+
 }
 

@@ -151,6 +151,7 @@ void ModelTakuzu::playAt(int i, int j, Pawn pawn)
     Pawn newPawn = pawn;
     updateCount(i, j, oldPawn, newPawn);
     _currentGrid[i * _sizeMap + j] = c;
+    positionIsValid(i, j);
     emit notifyNewPawn(i, j, pawn);
 }
 
@@ -259,17 +260,15 @@ bool ModelTakuzu::positionIsValid(int i, int j)
         emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, isOK);
     }
     if (oneOtherIdenticalRowColIsFound(oneOtherIdenticalCol)) {
-        emit notifyCommonPatterns(i, oneOtherIdenticalCol, isVertical, !isOK);
+        emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, !isOK);
     } else {
-        emit notifyCommonPatterns(i, oneOtherIdenticalCol, isVertical, isOK);
+        emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, isOK);
     }
 
-    bool isValid = (!repetitionInRow &&
+    return (!repetitionInRow &&
                     !repetitionInCol &&
                     (oneOtherIdenticalRow == _sizeMap) &&
                     (oneOtherIdenticalCol == _sizeMap));
-    emit notifyPositionIsValid(i, j, isValid);
-    return isValid;
 }
 
 bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
