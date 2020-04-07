@@ -2,7 +2,6 @@
 #include "ui_MainWindow.h"
 #include <QInputDialog>
 #include <QTimer>
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,11 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete _ui;
-}
-
-QWidget *MainWindow::getGrid() const
-{
-    return _ui->gridWidget;
+    delete _time;
 }
 
 void MainWindow::registerSetNewGame()
@@ -53,4 +48,19 @@ void MainWindow::startChrono()
 void MainWindow::registerChronoChanged()
 {
     _ui->timeEdit->setTime(QTime(0,0).addMSecs(_time->elapsed()));
+}
+
+QWidget *MainWindow::getGrid() const
+{
+    return _ui->gridWidget;
+}
+
+QToolButton *MainWindow::getRedoButton() const
+{
+    return _ui->redoButton;
+}
+
+QToolButton *MainWindow::getUndoButton() const
+{
+    return _ui->undoButton;
 }

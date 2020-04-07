@@ -1,4 +1,5 @@
 #include "PlayCommand.h"
+#include <assert.h>
 
 PlayCommand::PlayCommand(ModelTakuzu *m, int i, int j, Pawn p)
 {

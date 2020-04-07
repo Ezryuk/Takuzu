@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QToolButton>
 
 namespace Ui {
 class MainWindow;
@@ -16,6 +17,8 @@ public:
     void startChrono();
     ~MainWindow();
     QWidget *getGrid() const;
+    QToolButton *getRedoButton() const;
+    QToolButton *getUndoButton() const;
 
 signals:
     void notifyMapChosen(QString size, QString level);
@@ -26,7 +29,7 @@ public slots:
 
 private:
     Ui::MainWindow *_ui;
-    QTime * _time;
+    QTime *_time;
 };
 
 #endif // MAINWINDOW_H

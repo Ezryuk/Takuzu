@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
     presenter->_model->chooseMapPool(ModelTakuzu::Easy, 6);
     presenter->_model->setRandomMap();
-    presenter->_model->registerPlayAt(1, 2, Black);
+    presenter->_model->playAt(1, 2, Black);
     presenter->_model->positionIsValid(3, 5, White);
     return a.exec();
 

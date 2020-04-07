@@ -33,6 +33,7 @@ signals:
 public slots:
     void registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
     void registerPositionIsValid(int i, int j, bool isValid);
+    void registerNewPawn(int i, int j, Pawn p);
 
 private:
     int _rows = 0;

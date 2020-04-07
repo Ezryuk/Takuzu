@@ -112,6 +112,7 @@ void Grid::registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol)
         _rowCounts[i*2+1] = Wrow;
         _colCounts[j*2] = Bcol;
         _colCounts[j*2+1] = Wcol;
+        repaint();
     }
 }
 
@@ -121,6 +122,15 @@ void Grid::registerPositionIsValid(int i, int j, bool isValid)
         _valid = isValid;
         _invalidSquare.setX(i);
         _invalidSquare.setY(j);
+        repaint();
+    }
+}
+
+void Grid::registerNewPawn(int i, int j, Pawn p)
+{
+    if (_rows != 0) {
+        _pawns[i*_rows+j] = p;
+        repaint();
     }
 }
 
