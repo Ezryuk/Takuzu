@@ -40,7 +40,7 @@ public:
     int setMap(int chosenMap);
     int setRandomMap();
     void playAt(int i, int j, Pawn pawn);
-    bool positionIsValid(int i, int j) const;
+    bool positionIsValid(int i, int j);
     /**
      * @brief positionIsValid \
      * no const because we simulate the play of pawn at (i,j)
@@ -50,8 +50,8 @@ public:
      * @return
      */
     bool positionIsValid(int i, int j, Pawn pawn); // no const because we simulate the play so attributes are modified
-    bool rowIsValid(int i) const;
-    bool colIsValid(int j) const;
+    bool rowIsValid(int i);
+    bool colIsValid(int j);
     void initCount();
     void updateCount();
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
@@ -61,6 +61,8 @@ signals:
     void notifyCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
     void notifyPositionIsValid(int i, int j, bool isValid) const;
     void notifyInitialPawn(int i, int j, Pawn readOnlyPawn);
+    void notifyOverThreeAdjacentPawns(int index, bool isVertical, bool isOK); // "!isVertical = isHorizontal"
+    void notifyCommonPatterns(int first, int second, bool isVertical, bool isOK);
 public slots:
     void registerPlayAt(int i, int j);
     void registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size);

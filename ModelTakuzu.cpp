@@ -217,7 +217,7 @@ Pawn ModelTakuzu::getPawn(int i, int j) const
     return TakuzuUtils::toPawn(_currentGrid[i * _sizeMap + j]);
 }
 
-bool ModelTakuzu::positionIsValid(int i, int j) const
+bool ModelTakuzu::positionIsValid(int i, int j)
 {
     char rowToScan[_sizeMap];
     memcpy(rowToScan, _currentGrid + _sizeMap * i, sizeof(char) * _sizeMap);
@@ -234,8 +234,35 @@ bool ModelTakuzu::positionIsValid(int i, int j) const
 
     bool repetitionInRow = TakuzuUtils::isBBBorWWWpresentIn(rowToScan);
     bool repetitionInCol = TakuzuUtils::isBBBorWWWpresentIn(colToScan);
+
+    const bool isVertical = true;
+    const bool isOK = true;
+    if (repetitionInRow) {
+        emit notifyOverThreeAdjacentPawns(i, !isVertical, !isOK);
+    } else /* !repetitionInRow */ {
+        emit notifyOverThreeAdjacentPawns(i, !isVertical, isOK);
+    }
+    if (repetitionInCol) {
+        emit notifyOverThreeAdjacentPawns(j, isVertical, !isOK);
+    } else /* !repetitionInCol */ {
+        emit notifyOverThreeAdjacentPawns(j, isVertical, isOK);
+    }
+
     int oneOtherIdenticalRow = findFirstIdenticalRow(i);
     int oneOtherIdenticalCol = findFirstIdenticalCol(j);
+    static auto oneOtherIdenticalRowColIsFound = [this](int index) -> bool {
+        return (index == _sizeMap);
+    };
+    if (oneOtherIdenticalRowColIsFound(oneOtherIdenticalRow)) {
+        emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, !isOK);
+    } else {
+        emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, isOK);
+    }
+    if (oneOtherIdenticalRowColIsFound(oneOtherIdenticalCol)) {
+        emit notifyCommonPatterns(i, oneOtherIdenticalCol, isVertical, !isOK);
+    } else {
+        emit notifyCommonPatterns(i, oneOtherIdenticalCol, isVertical, isOK);
+    }
 
     bool isValid = (!repetitionInRow &&
                     !repetitionInCol &&
@@ -254,7 +281,7 @@ bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
     return result;
 }
 
-bool ModelTakuzu::rowIsValid(int i) const
+bool ModelTakuzu::rowIsValid(int i)
 {
     static auto forAll = [](bool tab[], int length) -> bool {
         for (int i = 0; i < length; ++i) {
@@ -270,7 +297,7 @@ bool ModelTakuzu::rowIsValid(int i) const
             (_countPawn._Brow[i] == _countPawn._Wrow[i]);
 }
 
-bool ModelTakuzu::colIsValid(int j) const
+bool ModelTakuzu::colIsValid(int j)
 {
     static auto forAll = [](bool tab[], int length) -> bool {
         for (int i = 0; i < length; ++i) {
