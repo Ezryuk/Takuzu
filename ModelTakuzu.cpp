@@ -114,7 +114,9 @@ int ModelTakuzu::setMap(int chosenMap)
             emit notifyInitialPawn(i, j, TakuzuUtils::toPawn(_grids[chosenMap][i * _sizeMap + j]));
         }
     }
-    return chosenMap;
+    _chosenMap = chosenMap;
+    initCount();
+    return _chosenMap;
 }
 
 int ModelTakuzu::setRandomMap()
@@ -283,6 +285,15 @@ bool ModelTakuzu::colIsValid(int j) const
     }
     return forAll(tab, _sizeMap) &&
             (_countPawn._Bcol[j] == _countPawn._Wcol[j]);
+}
+
+void ModelTakuzu::initCount()
+{
+    for (int i = 0; i < _sizeMap; ++i) {
+        for (int j = 0; j < _sizeMap; ++j) {
+            updateCount(i, j, Empty, TakuzuUtils::toPawn(_grids[_chosenMap][i * _sizeMap + j]));
+        }
+    }
 }
 
 int ModelTakuzu::findFirstIdenticalRow(int i) const

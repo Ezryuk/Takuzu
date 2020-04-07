@@ -52,6 +52,7 @@ public:
     bool positionIsValid(int i, int j, Pawn pawn); // no const because we simulate the play so attributes are modified
     bool rowIsValid(int i) const;
     bool colIsValid(int j) const;
+    void initCount();
     void updateCount();
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
     Pawn getPawn(int i, int j) const;
