@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QToolButton>
+#include <ModelTakuzu.h>
 
 namespace Ui {
 class MainWindow;
@@ -21,7 +22,7 @@ public:
     QToolButton *getUndoButton() const;
 
 signals:
-    void notifyMapChosen(QString size, QString level);
+    void notifyMapChosen(ModelTakuzu::Difficulty level, int size);
 
 public slots:
     void registerSetNewGame();

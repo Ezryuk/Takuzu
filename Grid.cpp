@@ -60,6 +60,13 @@ void Grid::paintPawn(int row, int column, Pawn p) {
         _painter->eraseRect(rect.x()+2, rect.y()+2, rect.width()-2, rect.height()-2);
         break;
     }
+    if (_initPawns[row*_rows+column]) {
+        _painter->setPen(Qt::red);
+        _painter->drawEllipse(center, width, width);
+        QPen pen(Qt::black);
+        pen.setWidth(3);
+        _painter->setPen(pen);
+    }
 }
 
 void Grid::paintCount(bool isRow, int index, int black, int white)
@@ -98,8 +105,10 @@ void Grid::setRows(int rows)
     _rows = rows;
     _rowCounts = new int[_rows*2]();
     _colCounts = new int[_rows*2]();
+    _initPawns = new bool[_rows*_rows];
     _pawns = new Pawn[_rows*_rows];
     for (int i = 0; i < _rows*_rows; i++) {
+        _initPawns[i] = false;
         _pawns[i] = Empty;
     }
     repaint();
@@ -107,30 +116,30 @@ void Grid::setRows(int rows)
 
 void Grid::registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol)
 {
-    if (_rows != 0) {
-        _rowCounts[i*2] = Brow;
-        _rowCounts[i*2+1] = Wrow;
-        _colCounts[j*2] = Bcol;
-        _colCounts[j*2+1] = Wcol;
-        repaint();
-    }
+    _rowCounts[j*2] = Brow;
+    _rowCounts[j*2+1] = Wrow;
+    _colCounts[i*2] = Bcol;
+    _colCounts[i*2+1] = Wcol;
+    repaint();
 }
 
 void Grid::registerPositionIsValid(int i, int j, bool isValid)
 {
-    if (_rows != 0) {
-        _valid = isValid;
-        _invalidSquare.setX(i);
-        _invalidSquare.setY(j);
-        repaint();
-    }
+    _valid = isValid;
+    _invalidSquare.setX(i);
+    _invalidSquare.setY(j);
+    repaint();
+}
+
+void Grid::registerInitialPawn(int i, int j, Pawn p)
+{
+    _initPawns[i*_rows+j] = true;
+    _pawns[i*_rows+j] = p;
 }
 
 void Grid::registerNewPawn(int i, int j, Pawn p)
 {
-    if (_rows != 0) {
-        _pawns[i*_rows+j] = p;
-        repaint();
-    }
+    _pawns[i*_rows+j] = p;
+    repaint();
 }
 

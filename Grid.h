@@ -33,6 +33,7 @@ signals:
 public slots:
     void registerCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
     void registerPositionIsValid(int i, int j, bool isValid);
+    void registerInitialPawn(int i, int j, Pawn p);
     void registerNewPawn(int i, int j, Pawn p);
 
 private:
@@ -45,6 +46,7 @@ private:
     QRect* _columnCountArea;
     int* _rowCounts;
     int* _colCounts;
+    bool* _initPawns;
     Pawn* _pawns;
     bool _valid = true;
     QPoint _invalidSquare;

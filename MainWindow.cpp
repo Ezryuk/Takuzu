@@ -26,11 +26,12 @@ void MainWindow::registerSetNewGame()
     QString size = QInputDialog::getItem(this, "Choose map size", "Size :", sizes, 0, false, &ok);
     if (ok && !size.isEmpty()) {
         QStringList levels;
-        levels << "easy" << "hard";
+        levels << "Easy" << "Hard";
         QString level = QInputDialog::getItem(this, "Choose difficulty level", "Level :", levels, 0, false, &ok);
+        ModelTakuzu::Difficulty difficulty = level=="Easy"?ModelTakuzu::Difficulty::Easy:ModelTakuzu::Difficulty::Hard;
         if (ok && !level.isEmpty()) {
             _ui->gridWidget->setRows(size.toInt());
-            emit notifyMapChosen(size, level);
+            emit notifyMapChosen(difficulty, size.toInt());
             startChrono();
         }
     }
