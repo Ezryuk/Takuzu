@@ -133,8 +133,11 @@ void Grid::registerPositionIsValid(int i, int j, bool isValid)
 
 void Grid::registerInitialPawn(int i, int j, Pawn p)
 {
-    _initPawns[i*_rows+j] = true;
+    if (p == Empty) {
+        _initPawns[i*_rows+j] = true;
+    }
     _pawns[i*_rows+j] = p;
+    repaint();
 }
 
 void Grid::registerNewPawn(int i, int j, Pawn p)
