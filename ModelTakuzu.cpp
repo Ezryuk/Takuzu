@@ -8,18 +8,7 @@
 #include <cstring>
 #include <cassert>
 
-namespace TakuzuUtils {
-/**
- * @brief isBBBorWWWpresentIn is not meant to be used by external user \
- *
- * @param strToScan pointer to the beginning of char[] to be scanned
- * @return true or false
- */
-bool isBBBorWWWpresentIn(char *strToScan);
-Pawn permuteR(Pawn p);
-Pawn toPawn(char c);
-char toChar(Pawn p);
-}
+
 
 ModelTakuzu::ModelTakuzu()
 {
@@ -124,7 +113,7 @@ int ModelTakuzu::setRandomMap()
     return randomGridIndex;
 }
 
-void ModelTakuzu::registerPlayAt(int i, int j, Pawn pawn)
+void ModelTakuzu::playAt(int i, int j, Pawn pawn)
 {
         std::cout << "call playAt with params " << i << " and " << j << "\n";
     assert((_currentGrid != nullptr) && \
@@ -206,6 +195,11 @@ void ModelTakuzu::updateCount(int i, int j, Pawn oldPawn, Pawn newPawn)
                      _countPawn._Wcol[j]);
 }
 
+Pawn ModelTakuzu::getPawn(int i, int j) const
+{
+    return TakuzuUtils::toPawn(_currentGrid[i * _sizeMap + j]);
+}
+
 bool ModelTakuzu::positionIsValid(int i, int j) const
 {
     char rowToScan[_sizeMap];
@@ -237,7 +231,7 @@ bool ModelTakuzu::positionIsValid(int i, int j) const
 bool ModelTakuzu::positionIsValid(int i, int j, Pawn pawn)
 {
     char oldPawn = _currentGrid[i * _sizeMap + j];
-    registerPlayAt(i, j, pawn); // simulate the play
+    playAt(i, j, pawn); // simulate the play
     bool result = positionIsValid(i, j);
     _currentGrid[i * _sizeMap + j] = oldPawn; // undo the simulation
     return result;
@@ -328,7 +322,7 @@ void ModelTakuzu::registerPlayAt(int i, int j)
     Pawn nextPawn = TakuzuUtils::
             permuteR(TakuzuUtils::
                      toPawn(_currentGrid[i * _sizeMap + j]));
-    registerPlayAt(i, j, nextPawn);
+    playAt(i, j, nextPawn);
     emit notifyNewPawn(i, j, nextPawn);
 }
 
@@ -371,6 +365,16 @@ char toChar(Pawn p) {
     case White: return 'W';
     case Empty: return '.';
     default: return '.';
+    }
+}
+
+Pawn permuteL(Pawn p) {
+    if (p == Black) {
+        return Empty;
+    } else if (p == Empty) {
+        return White;
+    } else /* if (p == White) */ {
+        return Black;
     }
 }
 

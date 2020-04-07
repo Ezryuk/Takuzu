@@ -2,6 +2,7 @@
 #define PRESENTERTAKUZU_H
 
 #include <QObject>
+#include <QUndoStack>
 
 #include "ModelTakuzu.h"
 #include "MainWindow.h"
@@ -13,11 +14,13 @@ public:
     ~PresenterTakuzu();
     void startNewGame();
 public:
-    ModelTakuzu *model;
-    MainWindow *view;
+    ModelTakuzu *_model;
+    MainWindow *_view;
 signals:
 public slots:
+    void registerCommand(int i, int j);
 private:
+    QUndoStack *_undoStack;
 };
 
 #endif // PRESENTERTAKUZU_H

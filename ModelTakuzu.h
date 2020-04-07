@@ -11,6 +11,20 @@ enum Pawn {
     Empty
 };
 
+namespace TakuzuUtils {
+/**
+ * @brief isBBBorWWWpresentIn is not meant to be used by external user \
+ *
+ * @param strToScan pointer to the beginning of char[] to be scanned
+ * @return true or false
+ */
+bool isBBBorWWWpresentIn(char *strToScan);
+Pawn permuteR(Pawn p);
+Pawn permuteL(Pawn p);
+Pawn toPawn(char c);
+char toChar(Pawn p);
+}
+
 class ModelTakuzu : public QObject
 {
     Q_OBJECT
@@ -25,7 +39,7 @@ public:
     void chooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
     void setMap(int chosenMap);
     int setRandomMap();
-    void registerPlayAt(int i, int j, Pawn pawn);
+    void playAt(int i, int j, Pawn pawn);
     bool positionIsValid(int i, int j) const;
     /**
      * @brief positionIsValid \
@@ -40,7 +54,7 @@ public:
     bool colIsValid(int j) const;
     void updateCount();
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
-
+    Pawn getPawn(int i, int j) const;
 signals:
     void notifyNewPawn(int i, int j, Pawn newPawn);
     void notifyCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);

@@ -28,13 +28,15 @@ SOURCES += \
         MainWindow.cpp \
         Grid.cpp \
         ModelTakuzu.cpp \
-    PresenterTakuzu.cpp
+    PresenterTakuzu.cpp \
+    PlayCommand.cpp
 
 HEADERS += \
         MainWindow.h \
         Grid.h \
         ModelTakuzu.h \
-    PresenterTakuzu.h
+    PresenterTakuzu.h \
+    PlayCommand.h
 
 FORMS += \
         MainWindow.ui
