@@ -631,14 +631,25 @@ bool ModelTakuzu::positionIsValid(int i, int j)
         }
         return _sizeMap;
     };
+
+    const bool isVertical = true;
+    const bool isOK = true;
+    if (repetitionInRow) {
+        emit notifyOverThreeAdjacentPawns(i, !isVertical, !isOK);
+    } else /* !repetitionInRow */ {
+        emit notifyOverThreeAdjacentPawns(i, !isVertical, isOK);
+    }
+    if (repetitionInCol) {
+        emit notifyOverThreeAdjacentPawns(j, isVertical, !isOK);
+    } else /* !repetitionInCol */ {
+        emit notifyOverThreeAdjacentPawns(j, isVertical, isOK);
+    }
+
     int oneOtherIdenticalRow = findFirstIdenticalRow(i);
     int oneOtherIdenticalCol = findFirstIdenticalCol(j);
     static auto oneOtherIdenticalRowColIsFound = [this](int index) -> bool {
         return (index == _sizeMap);
     };
-
-    bool isVertical = true;
-    bool isOK = true;
     if (oneOtherIdenticalRowColIsFound(oneOtherIdenticalRow)) {
         emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, !isOK);
     } else {
