@@ -25,7 +25,7 @@ signals:
     void notifyMapChosen(ModelTakuzu::Difficulty level, int size);
 
 public slots:
-//    void registerSetNewGame();
+    void registerSetNewGame();
     void registerChronoChanged();
     void registerQuitPressed();
     void registerRulesPressed();
