@@ -492,7 +492,6 @@ void ModelTakuzu::loadFile(const QString &name)
             std::cerr << "Issue when reading new line. \n"\
                       << "Make sure the file has the same path as the executable.\n";
         }
-        _sizeMap = 6;
         // allocate the grids
         _grids = new Grid_[_nbMaps];
         for (int i = 0; i < _nbMaps; ++i) {
@@ -503,13 +502,13 @@ void ModelTakuzu::loadFile(const QString &name)
         int i = 0;
         while (!in.atEnd()) {
             line = in.readLine();
-            Grid_ &currentlyFilledGrid = _grids[i++];
             int letterIndex = 0;
             QChar letter;
             foreach(letter, line) {
                 if (letterIndex < _sizeMap * _sizeMap)
-                    currentlyFilledGrid[letterIndex++] = ModelTakuzu::toPawn(letter);
+                    _grids[i][letterIndex++] = ModelTakuzu::toPawn(letter);
             }
+            i++;
         }
     }
 }
@@ -524,7 +523,9 @@ void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
     }
     _difficulty = difficulty;
     _sizeMap = size;
+    _currentGrid = Grid_(_sizeMap * _sizeMap);
     loadFile(QString(name));
+    setRandomMap();
 }
 
 int ModelTakuzu::setMap(int chosenMap)
@@ -533,25 +534,19 @@ int ModelTakuzu::setMap(int chosenMap)
                  " Size map: " << _sizeMap << "\n";
     assert((_nbMaps != -1 || _sizeMap != -1) && \
            "Choose a map pool before using setRandomMap().");
-    _currentGrid.clear(); // _currentGrid allocated by setRandomMap() or nullptr
     // load a fresh new grid in _current grid
-    _currentGrid = Grid_(_grids[_chosenMap]);
-
-    _countPawn._Wrow.clear();
-    _countPawn._Brow.clear();
-    _countPawn._Wcol.clear();
-    _countPawn._Bcol.clear();
+    _currentGrid = Grid_(_grids[chosenMap]);
     _countPawn = {
         std::vector<int>(_sizeMap),
         std::vector<int>(_sizeMap),
         std::vector<int>(_sizeMap),
         std::vector<int>(_sizeMap)
     };
-//    for(int i = 0; i < _sizeMap; ++i) {
-//        for (int j = 0; j < _sizeMap; ++j) {
-//            emit notifyInitialPawn(i, j, TakuzuUtils::toPawn(_grids[chosenMap][i * _sizeMap + j]));
-//        }
-//    }
+    for(int i = 0; i < _sizeMap; ++i) {
+        for (int j = 0; j < _sizeMap; ++j) {
+            emit notifyInitialPawn(i, j, _grids[chosenMap][i * _sizeMap + j]);
+        }
+    }
 
     _chosenMap = chosenMap;
     initCount();
@@ -615,7 +610,8 @@ bool ModelTakuzu::positionIsValid(int i, int j)
         }
         return _sizeMap; // we reached the end of rows list, no similarities found
     };
-    static auto findFirstIdenticalCol = [&colToScan, this](int j) -> int {
+
+    static auto findFirstIdenticalCol = [colToScan, this](int j) -> int {
         for (int colIndex = 0; colIndex < _sizeMap; ++colIndex) {
             if (colIndex != j) {
                 // let's compare our column with each other column one by one
@@ -683,8 +679,7 @@ bool ModelTakuzu::colIsValid(int j)
             if (!tab[i]) return false;
         }
         return true;
-    }; // better allocate lambda twice in total rather than create a
-    // private method ?
+    };
     bool tab[_sizeMap];
     for (int i = 0; i < _sizeMap; ++i) {
         tab[i] = positionIsValid(i, j);
