@@ -102,3 +102,8 @@ QToolButton *MainWindow::getUndoButton() const
 {
     return _ui->undoButton;
 }
+
+QLabel *MainWindow::getLabelNbUndo() const
+{
+    return _ui->labelUndo;
+}

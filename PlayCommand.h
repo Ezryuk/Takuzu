@@ -17,6 +17,7 @@ private:
     int _row;
     int _col;
     Pawn _pawn;
+    int _nbUndo;
 };
 
 #endif // PLAYCOMMAND_H

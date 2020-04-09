@@ -1,5 +1,6 @@
 #include "PresenterTakuzu.h"
 #include "PlayCommand.h"
+#include <QDebug>
 
 PresenterTakuzu::PresenterTakuzu(QObject *parent) : QObject(parent)
 {
@@ -18,6 +19,8 @@ PresenterTakuzu::PresenterTakuzu(QObject *parent) : QObject(parent)
     connect(_view->getGrid(), SIGNAL(notifyCoordinatesClicked(int, int)), this, SLOT(registerCommand(int, int)));
     connect(_model, SIGNAL(notifyOverThreeAdjacentPawns(int,bool,bool)), _view->getGrid(), SLOT(registerOverThreeAdjacentPawns(int,bool,bool)));
     connect(_model, SIGNAL(notifyCommonPatterns(int,int,bool,bool)), _view->getGrid(), SLOT(registerCommonPatterns(int,int,bool,bool)));
+    connect(_view->getUndoButton(), SIGNAL(triggered(QAction*)), this, SLOT(registerUndoRedoTriggered()));
+    connect(_view->getRedoButton(), SIGNAL(triggered(QAction*)), this, SLOT(registerUndoRedoTriggered()));
 }
 
 PresenterTakuzu::~PresenterTakuzu()
@@ -28,5 +31,11 @@ PresenterTakuzu::~PresenterTakuzu()
 void PresenterTakuzu::registerCommand(int i, int j)
 {
     _undoStack->push(new PlayCommand(_model, i, j, _model->getPawn(i, j)));
+    _view->getLabelNbUndo()->setText("Number of undo done : "+QString::number(0));
+}
+
+void PresenterTakuzu::registerUndoRedoTriggered()
+{
+    _view->getLabelNbUndo()->setText("Number of undo done : "+QString::number(_undoStack->count()-_undoStack->index()));
 }
 

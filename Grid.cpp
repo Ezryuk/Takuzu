@@ -212,7 +212,6 @@ void Grid::registerOverThreeAdjacentPawns(int index, bool isVertical, bool isOk)
 
 void Grid::registerCommonPatterns(int first, int second, bool isVertical, bool isOK)
 {
-    //qDebug() << first << " and " << second << " " << isOK << " vertical " << isVertical;
     if (isVertical) {
         if (isOK) {
             _commonColumns[second*_rows+first] = isOK;
