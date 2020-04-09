@@ -562,6 +562,7 @@ int ModelTakuzu::setRandomMap()
 
 void ModelTakuzu::playAt(int i, int j, Pawn pawn)
 {
+
     std::cout << "call playAt with params " << i << " and " << j << "\n";
     assert((!_currentGrid.empty()) && \
            "Set a map using setRandomMap() before calling playAt().");
@@ -598,7 +599,7 @@ bool ModelTakuzu::positionIsValid(int i, int j)
     bool repetitionInCol = isBBBorWWWpresentIn(colToScan);
 
 
-    static auto findFirstIdenticalRow = [&rowToScan, this](int i) -> int {
+    static auto findFirstIdenticalRow = [this](int i, std::vector<Pawn> rowToScan) -> int {
         for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {
             if (rowIndex != i) {
                 if (std::equal(_currentGrid.cbegin() + rowIndex * _sizeMap,
@@ -611,7 +612,7 @@ bool ModelTakuzu::positionIsValid(int i, int j)
         return _sizeMap; // we reached the end of rows list, no similarities found
     };
 
-    static auto findFirstIdenticalCol = [colToScan, this](int j) -> int {
+    static auto findFirstIdenticalCol = [this](int j, std::vector<Pawn> colToScan) -> int {
         for (int colIndex = 0; colIndex < _sizeMap; ++colIndex) {
             if (colIndex != j) {
                 // let's compare our column with each other column one by one
@@ -645,8 +646,8 @@ bool ModelTakuzu::positionIsValid(int i, int j)
         emit notifyOverThreeAdjacentPawns(j, isVertical, isOK);
     }
 
-    int oneOtherIdenticalRow = findFirstIdenticalRow(i);
-    int oneOtherIdenticalCol = findFirstIdenticalCol(j);
+    int oneOtherIdenticalRow = findFirstIdenticalRow(i, rowToScan);
+    int oneOtherIdenticalCol = findFirstIdenticalCol(j, colToScan);
     static auto oneOtherIdenticalRowColIsFound = [this](int index) -> bool {
         return (index == _sizeMap);
     };

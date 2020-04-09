@@ -52,12 +52,16 @@ void Grid::paintEvent(QPaintEvent *)
         QPen penYellow(Qt::yellow);
         penYellow.setWidth(3);
         _painter->setPen(penYellow);
-        if (_commonRows[i]) {
+        if (_commonRows[i]!=_rows) {
             rect = _rects[0][i];
             _painter->drawRect(rect.x(), rect.y(), _rows*_widthRect, _widthRect);
+            rect = _rects[0][_commonRows[i]];
+            _painter->drawRect(rect.x(), rect.y(), _rows*_widthRect, _widthRect);
         }
-        if (_commonColumns[i]) {
+        if (_commonColumns[i]!=_rows) {
             rect = _rects[i][0];
+            _painter->drawRect(rect.x(), rect.y(), _widthRect, _rows*_widthRect);
+            rect = _rects[_commonColumns[i]][0];
             _painter->drawRect(rect.x(), rect.y(), _widthRect, _rows*_widthRect);
         }
         _painter->setPen(*_pen);
@@ -154,14 +158,14 @@ void Grid::setRows(int rows)
     _pawns = new Pawn[_rows*_rows];
     _invalidHorizontal = new bool[_rows];
     _invalidVertical = new bool[_rows];
-    _commonRows = new bool[_rows];
-    _commonColumns = new bool[_rows];
+    _commonRows = new int[_rows];
+    _commonColumns = new int[_rows];
 
     for (int i = 0; i < _rows; i++) {
         _invalidHorizontal[i] = false;
         _invalidVertical[i] = false;
-        _commonRows[i] = false;
-        _commonColumns[i] = false;
+        _commonRows[i] = _rows;
+        _commonColumns[i] = _rows;
         for (int j = 0; j < _rows; j++) {
             _initPawns[i*_rows+j] = false;
             _pawns[i*_rows+j] = Empty;
@@ -208,14 +212,18 @@ void Grid::registerCommonPatterns(int first, int second, bool isVertical, bool i
 {
     qDebug() << first << " and " << second << " " << isOK << " vertical " << isVertical;
     if (isVertical) {
-        _commonColumns[first] = isOK;
-        if (second != _rows) {
-            _commonColumns[second] = isOK;
+        _commonColumns[first] = second;
+        if (!isOK) {
+            _commonColumns[second] = first;
+        } else {
+            _commonColumns[_commonColumns[first]] = _rows;
         }
     } else {
-        _commonRows[first] = isOK;
-        if (second != _rows) {
-            _commonRows[second] = isOK;
+        _commonRows[first] = second;
+        if (!isOK) {
+            _commonRows[second] = first;
+        } else {
+            _commonRows[_commonRows[first]] = _rows;
         }
     }
 }
