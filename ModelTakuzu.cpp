@@ -1,5 +1,6 @@
 #include "ModelTakuzu.h"
 
+#if 0
 #include <QFile>
 #include <QIODevice>
 #include <QTextStream>
@@ -432,4 +433,338 @@ Pawn permuteL(Pawn p) {
 }
 
 
+#endif
 
+#include <iostream>
+#include <QtAlgorithms>
+#include <QDebug>
+#include <QFile>
+#include <QTextStream>
+
+ModelTakuzu::ModelTakuzu()
+{
+    _nbMaps  = -1;
+    _sizeMap = -1;
+    _grids = nullptr;
+}
+
+ModelTakuzu::~ModelTakuzu()
+{
+    delete[] _grids;
+}
+
+Pawn ModelTakuzu::permuteR(Pawn p)
+{
+    if (p == Black) {
+        return White;
+    } else if (p == White) {
+        return Empty;
+    } else /* if (p == Empty) */ {
+        return Black;
+    }
+}
+
+Pawn ModelTakuzu::permuteL(Pawn p)
+{
+    if (p == Black) {
+        return Empty;
+    } else if (p == Empty) {
+        return White;
+    } else /* if (p == White) */ {
+        return Black;
+    }
+}
+
+void ModelTakuzu::loadFile(const QString &name)
+{
+    QFile file(":/resources/"+name);
+    if (!(file.open(QIODevice::ReadOnly | QIODevice::Text))) {
+        std::cerr << "Error while opening new file: " << name.toStdString() << " .\n";
+    } else {
+        QString line;
+        QTextStream in(&file);
+
+        // read number of grids in file
+        bool ok = true;
+        _nbMaps = in.readLine().toInt(&ok);
+        if (!ok) {
+            std::cerr << "Issue when reading new line. \n"\
+                      << "Make sure the file has the same path as the executable.\n";
+        }
+        _sizeMap = 6;
+        // allocate the grids
+        _grids = new Grid_[_nbMaps];
+        for (int i = 0; i < _nbMaps; ++i) {
+            _grids[i] = Grid_(_sizeMap * _sizeMap);
+        }
+
+        // fill the grids
+        int i = 0;
+        while (!in.atEnd()) {
+            line = in.readLine();
+            Grid_ &currentlyFilledGrid = _grids[i++];
+            int letterIndex = 0;
+            QChar letter;
+            foreach(letter, line) {
+                if (letterIndex < _sizeMap * _sizeMap)
+                    currentlyFilledGrid[letterIndex++] = ModelTakuzu::toPawn(letter);
+            }
+        }
+    }
+}
+
+void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
+{
+    QString name = QString::number(size);
+    if (difficulty == Easy) {
+        name.append("_easy.txt");
+    } else /* (difficulty == Hard) */ {
+        name.append("_hard.txt");
+    }
+    _difficulty = difficulty;
+    _sizeMap = size;
+    loadFile(QString(name));
+}
+
+int ModelTakuzu::setMap(int chosenMap)
+{
+    std::cout << "Nb maps: " << _nbMaps <<
+                 " Size map: " << _sizeMap << "\n";
+    assert((_nbMaps != -1 || _sizeMap != -1) && \
+           "Choose a map pool before using setRandomMap().");
+    _currentGrid.clear(); // _currentGrid allocated by setRandomMap() or nullptr
+    // load a fresh new grid in _current grid
+    _currentGrid = Grid_(_grids[_chosenMap]);
+
+    _countPawn._Wrow.clear();
+    _countPawn._Brow.clear();
+    _countPawn._Wcol.clear();
+    _countPawn._Bcol.clear();
+    _countPawn = {
+        std::vector<int>(_sizeMap),
+        std::vector<int>(_sizeMap),
+        std::vector<int>(_sizeMap),
+        std::vector<int>(_sizeMap)
+    };
+//    for(int i = 0; i < _sizeMap; ++i) {
+//        for (int j = 0; j < _sizeMap; ++j) {
+//            emit notifyInitialPawn(i, j, TakuzuUtils::toPawn(_grids[chosenMap][i * _sizeMap + j]));
+//        }
+//    }
+
+    _chosenMap = chosenMap;
+    initCount();
+    return _chosenMap;
+}
+
+int ModelTakuzu::setRandomMap()
+{
+    int randomGridIndex = (rand() % _nbMaps);
+    _chosenMap = setMap(randomGridIndex);
+    return randomGridIndex;
+}
+
+void ModelTakuzu::playAt(int i, int j, Pawn pawn)
+{
+    std::cout << "call playAt with params " << i << " and " << j << "\n";
+    assert((!_currentGrid.empty()) && \
+           "Set a map using setRandomMap() before calling playAt().");
+    Pawn oldPawn = _currentGrid[i * _sizeMap + j];
+    Pawn newPawn = pawn;
+    updateCount(i, j, oldPawn, newPawn);
+    _currentGrid[i * _sizeMap + j] = newPawn;
+    positionIsValid(i, j);
+    emit notifyNewPawn(i, j, pawn);
+}
+
+bool ModelTakuzu::positionIsValid(int i, int j)
+{
+
+
+    std::vector<Pawn> rowToScan(_sizeMap);
+    std::copy(_currentGrid.begin() + i * _sizeMap,
+              _currentGrid.begin() + (i + 1) * _sizeMap,
+              rowToScan.begin());
+
+    std::vector<Pawn> colToScan(_sizeMap);
+    for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {
+        colToScan[rowIndex] = _currentGrid[rowIndex * _sizeMap + j];
+    }
+
+    static auto isBBBorWWWpresentIn = [this](std::vector<Pawn> &vec) -> bool {
+        static std::vector<Pawn> vecBBB = {Black, Black, Black};
+        static std::vector<Pawn> vecWWW = {White, White, White};
+        auto itB = std::search(vec.cbegin(), vec.cend(), vecBBB.cbegin(), vecBBB.cend());
+        auto itW = std::search(vec.cbegin(), vec.cend(), vecWWW.cbegin(), vecWWW.cend());
+        return (itB != vec.cend() || itW != vec.cend());
+    };
+    bool repetitionInRow = isBBBorWWWpresentIn(rowToScan);
+    bool repetitionInCol = isBBBorWWWpresentIn(colToScan);
+
+
+    static auto findFirstIdenticalRow = [&rowToScan, this](int i) -> int {
+        for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {
+            if (rowIndex != i) {
+                if (std::equal(_currentGrid.cbegin() + i * _sizeMap,
+                           _currentGrid.cbegin() + (i + 1) * _sizeMap,
+                               rowToScan.cbegin())) {
+                    return rowIndex; // we have found two identical rows
+                }
+            }
+        }
+        return _sizeMap; // we reached the end of rows list, no similarities found
+    };
+    static auto findFirstIdenticalCol = [&colToScan, this](int j) -> int {
+        for (int colIndex = 0; colIndex < _sizeMap; ++colIndex) {
+            if (colIndex != j) {
+                // let's compare our column with each other column one by one
+                int commomThreshold = 0;
+                // compare from left to right char by char
+                while ((colToScan[commomThreshold] ==
+                        _currentGrid[commomThreshold * _sizeMap + colIndex]) &&
+                       commomThreshold < _sizeMap) {
+                    commomThreshold++;
+                }
+                // if we reached at the end, it means our two cols are the same
+                if (commomThreshold == _sizeMap) {
+                    // we found two identical columns
+                    return colIndex;
+                }
+            }
+        }
+        return _sizeMap;
+    };
+    int oneOtherIdenticalRow = findFirstIdenticalRow(i);
+    int oneOtherIdenticalCol = findFirstIdenticalCol(j);
+    static auto oneOtherIdenticalRowColIsFound = [this](int index) -> bool {
+        return (index == _sizeMap);
+    };
+
+    bool isVertical = true;
+    bool isOK = true;
+    if (oneOtherIdenticalRowColIsFound(oneOtherIdenticalRow)) {
+        emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, !isOK);
+    } else {
+        emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, isOK);
+    }
+    if (oneOtherIdenticalRowColIsFound(oneOtherIdenticalCol)) {
+        emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, !isOK);
+    } else {
+        emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, isOK);
+    }
+
+    return (!repetitionInRow &&
+            !repetitionInCol &&
+            (oneOtherIdenticalRow == _sizeMap) &&
+            (oneOtherIdenticalCol == _sizeMap));
+}
+
+bool ModelTakuzu::rowIsValid(int i)
+{
+    static auto forAll = [](bool tab[], int length) -> bool {
+        for (int i = 0; i < length; ++i) {
+            if (!tab[i]) return false;
+        }
+        return true;
+    };
+    bool tab[_sizeMap];
+    for (int j = 0; j < _sizeMap; ++j) {
+        tab[j] = positionIsValid(i, j);
+    }
+    return forAll(tab, _sizeMap) &&
+            (_countPawn._Brow[i] == _countPawn._Wrow[i]);
+}
+
+bool ModelTakuzu::colIsValid(int j)
+{
+    static auto forAll = [](bool tab[], int length) -> bool {
+        for (int i = 0; i < length; ++i) {
+            if (!tab[i]) return false;
+        }
+        return true;
+    }; // better allocate lambda twice in total rather than create a
+    // private method ?
+    bool tab[_sizeMap];
+    for (int i = 0; i < _sizeMap; ++i) {
+        tab[i] = positionIsValid(i, j);
+    }
+    return forAll(tab, _sizeMap) &&
+            (_countPawn._Bcol[j] == _countPawn._Wcol[j]);
+}
+
+void ModelTakuzu::initCount()
+{
+    for (int i = 0; i < _sizeMap; ++i) {
+        for (int j = 0; j < _sizeMap; ++j) {
+            updateCount(i, j, Empty, _grids[_chosenMap][i * _sizeMap + j]);
+        }
+    }
+}
+
+void ModelTakuzu::updateCount(int i, int j, Pawn oldPawn, Pawn newPawn)
+{
+    if (oldPawn != newPawn) {
+        switch (oldPawn) {
+        case Black:
+            _countPawn._Brow[i]--;
+            _countPawn._Bcol[j]--;
+            break;
+        case White:
+            _countPawn._Wrow[i]--;
+            _countPawn._Wcol[j]--;
+            break;
+        case Empty:
+            break;
+        }
+        switch (newPawn) {
+        case Black:
+            _countPawn._Brow[i]++;
+            _countPawn._Bcol[j]++;
+            break;
+        case White:
+            _countPawn._Wrow[i]++;
+            _countPawn._Wcol[j]++;
+            break;
+        case Empty:
+            break;
+        }
+    }
+    emit notifyCount(i, j,
+                     _countPawn._Brow[i],
+                     _countPawn._Bcol[j],
+                     _countPawn._Wrow[i],
+                         _countPawn._Wcol[j]);
+}
+
+void ModelTakuzu::registerPlayAt(int i, int j)
+{
+    Pawn nextPawn = permuteR(_currentGrid[i * _sizeMap + j]);
+    playAt(i, j, nextPawn);
+}
+
+void ModelTakuzu::registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
+{
+    chooseMapPool(difficulty, size);
+}
+
+
+
+QChar ModelTakuzu::toQChar(Pawn pawn)
+{
+    switch (pawn) {
+    case Black: return QChar('B');
+    case White: return QChar('W');
+    case Empty: return QChar('.');
+    default: return QChar('.');
+    }
+}
+
+Pawn ModelTakuzu::toPawn(QChar letter)
+{
+    switch (letter.unicode()) {
+    case 'B': return Black;
+    case 'W': return White;
+    case '.': return Empty;
+    default: return Empty;
+    }
+}
