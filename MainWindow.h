@@ -27,6 +27,9 @@ signals:
 public slots:
     void registerSetNewGame();
     void registerChronoChanged();
+    void registerQuitPressed();
+    void registerRulesPressed();
+    void registerAboutPressed();
 
 private:
     Ui::MainWindow *_ui;
