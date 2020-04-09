@@ -12,6 +12,7 @@ PresenterTakuzu::PresenterTakuzu(QObject *parent) : QObject(parent)
     connect(_model, SIGNAL(notifyInitialPawn(int,int,Pawn)), _view->getGrid(), SLOT(registerInitialPawn(int,int,Pawn)));
     connect(_model, SIGNAL(notifyNewPawn(int,int,Pawn)), _view->getGrid(), SLOT(registerNewPawn(int,int,Pawn)));
     _undoStack = new QUndoStack(this);
+    _undoStack->setUndoLimit(10);
     _view->getUndoButton()->setDefaultAction(_undoStack->createUndoAction(this, tr("&Undo")));
     _view->getRedoButton()->setDefaultAction(_undoStack->createRedoAction(this, tr("&Redo")));
     connect(_view->getGrid(), SIGNAL(notifyCoordinatesClicked(int, int)), this, SLOT(registerCommand(int, int)));

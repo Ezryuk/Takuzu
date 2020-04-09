@@ -212,19 +212,25 @@ void Grid::registerCommonPatterns(int first, int second, bool isVertical, bool i
 {
     qDebug() << first << " and " << second << " " << isOK << " vertical " << isVertical;
     if (isVertical) {
-        _commonColumns[first] = second;
-        if (!isOK) {
+        if (isOK) {
             _commonColumns[second] = first;
         } else {
             _commonColumns[_commonColumns[first]] = _rows;
         }
+        _commonColumns[first] = second;
     } else {
-        _commonRows[first] = second;
-        if (!isOK) {
+        if (isOK) {
             _commonRows[second] = first;
         } else {
             _commonRows[_commonRows[first]] = _rows;
         }
+        _commonRows[first] = second;
+    }
+    for(int i = 0; i < _rows; i++) {
+        qDebug() << "col" << i << ": " << _commonColumns[i];
+    }
+    for(int i = 0; i < _rows; i++) {
+        qDebug() << "row" << i << ": " << _commonRows[i];
     }
 }
 
