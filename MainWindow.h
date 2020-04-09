@@ -32,10 +32,12 @@ public slots:
     void registerQuitPressed();
     void registerRulesPressed();
     void registerAboutPressed();
+    void registerEnd();
 
 private:
-    Ui::MainWindow *_ui;
-    QTime *_time;
+    Ui::MainWindow* _ui;
+    QTime* _time;
+    QTimer* _chrono;
 };
 
 #endif // MAINWINDOW_H*/

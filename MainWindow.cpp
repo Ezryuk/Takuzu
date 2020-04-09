@@ -50,11 +50,11 @@ void MainWindow::registerSetNewGame()
 
 void MainWindow::startChrono()
 {
-    QTimer * chrono = new QTimer(this);
-    chrono->start(1000);
+    _chrono = new QTimer(this);
+    _chrono->start(1000);
     _time = new QTime;
     _time->start();
-    connect(chrono, SIGNAL(timeout()), this, SLOT(registerChronoChanged()));
+    connect(_chrono, SIGNAL(timeout()), this, SLOT(registerChronoChanged()));
 }
 
 void MainWindow::registerChronoChanged()
@@ -86,6 +86,14 @@ void MainWindow::registerAboutPressed()
 {
     QMessageBox::information(this, "About this application", "Takuzu\n"
                              "(c) 2020 Christian Zheng and Quentin Derambure");
+}
+
+void MainWindow::registerEnd()
+{
+    _chrono->stop();
+    QMessageBox::information(this, "Victory !", "You won the game in "
+                             + QString::number(_time->minute()) + " minutes and "
+                             + QString::number(_time->second()) + " !");
 }
 
 QWidget *MainWindow::getGrid() const
