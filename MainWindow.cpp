@@ -88,7 +88,7 @@ void MainWindow::registerAboutPressed()
                              "(c) 2020 Christian Zheng and Quentin Derambure");
 }
 
-void MainWindow::registerEnd()
+void MainWindow::registerEndGame()
 {
     _chrono->stop();
     QMessageBox::information(this, "Victory !", "You won the game in "
