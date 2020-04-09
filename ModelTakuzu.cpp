@@ -601,8 +601,8 @@ bool ModelTakuzu::positionIsValid(int i, int j)
     static auto findFirstIdenticalRow = [&rowToScan, this](int i) -> int {
         for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {
             if (rowIndex != i) {
-                if (std::equal(_currentGrid.cbegin() + i * _sizeMap,
-                           _currentGrid.cbegin() + (i + 1) * _sizeMap,
+                if (std::equal(_currentGrid.cbegin() + rowIndex * _sizeMap,
+                           _currentGrid.cbegin() + (rowIndex + 1) * _sizeMap,
                                rowToScan.cbegin())) {
                     return rowIndex; // we have found two identical rows
                 }
