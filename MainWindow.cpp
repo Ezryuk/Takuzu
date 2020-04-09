@@ -34,9 +34,16 @@ void MainWindow::registerSetNewGame()
         QString level = QInputDialog::getItem(this, "Choose difficulty level", "Level :", levels, 0, false, &ok);
         ModelTakuzu::Difficulty difficulty = level=="Easy"?ModelTakuzu::Difficulty::Easy:ModelTakuzu::Difficulty::Hard;
         if (ok && !level.isEmpty()) {
-            _ui->gridWidget->setRows(size.toInt());
-            emit notifyMapChosen(difficulty, size.toInt());
-            startChrono();
+            QMessageBox::StandardButton button;
+            button = QMessageBox::question(this, "Choices",
+                                           "You have chosen a "+size+"x"+size+" map with the difficulty '"+level+"'.\n"
+                                           "Are you sure ?",
+                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+            if (button == QMessageBox::Yes) {
+                _ui->gridWidget->setRows(size.toInt());
+                emit notifyMapChosen(difficulty, size.toInt());
+                startChrono();
+            }
         }
     }
 }
