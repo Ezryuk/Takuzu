@@ -601,8 +601,8 @@ bool ModelTakuzu::positionIsValid(int i, int j)
     static auto findFirstIdenticalRow = [&rowToScan, this](int i) -> int {
         for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {
             if (rowIndex != i) {
-                if (std::equal(_currentGrid.cbegin() + i * _sizeMap,
-                           _currentGrid.cbegin() + (i + 1) * _sizeMap,
+                if (std::equal(_currentGrid.cbegin() + rowIndex * _sizeMap,
+                           _currentGrid.cbegin() + (rowIndex + 1) * _sizeMap,
                                rowToScan.cbegin())) {
                     return rowIndex; // we have found two identical rows
                 }
@@ -615,15 +615,15 @@ bool ModelTakuzu::positionIsValid(int i, int j)
         for (int colIndex = 0; colIndex < _sizeMap; ++colIndex) {
             if (colIndex != j) {
                 // let's compare our column with each other column one by one
-                int commomThreshold = 0;
-                // compare from left to right char by char
-                while ((colToScan[commomThreshold] ==
-                        _currentGrid[commomThreshold * _sizeMap + colIndex]) &&
-                       commomThreshold < _sizeMap) {
-                    commomThreshold++;
+                int commonThreshold = 0;
+                // compare from up to down cell by cell
+                while ((colToScan[commonThreshold] ==
+                        _currentGrid[commonThreshold * _sizeMap + colIndex]) &&
+                       commonThreshold < _sizeMap) {
+                    commonThreshold++;
                 }
                 // if we reached at the end, it means our two cols are the same
-                if (commomThreshold == _sizeMap) {
+                if (commonThreshold == _sizeMap) {
                     // we found two identical columns
                     return colIndex;
                 }
@@ -648,17 +648,17 @@ bool ModelTakuzu::positionIsValid(int i, int j)
     int oneOtherIdenticalRow = findFirstIdenticalRow(i);
     int oneOtherIdenticalCol = findFirstIdenticalCol(j);
     static auto oneOtherIdenticalRowColIsFound = [this](int index) -> bool {
-        return (index == _sizeMap);
+        return (index != _sizeMap);
     };
     if (oneOtherIdenticalRowColIsFound(oneOtherIdenticalRow)) {
-        emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, !isOK);
-    } else {
         emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, isOK);
+    } else {
+        emit notifyCommonPatterns(i, oneOtherIdenticalRow, !isVertical, !isOK);
     }
     if (oneOtherIdenticalRowColIsFound(oneOtherIdenticalCol)) {
-        emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, !isOK);
-    } else {
         emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, isOK);
+    } else {
+        emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, !isOK);
     }
 
     return (!repetitionInRow &&
