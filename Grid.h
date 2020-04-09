@@ -52,8 +52,8 @@ private:
     Pawn* _pawns;
     bool* _invalidVertical;
     bool* _invalidHorizontal;
-    bool* _commonRows;
-    bool* _commonColumns;
+    int* _commonRows;
+    int* _commonColumns;
 };
 
 #endif // GRID_H
