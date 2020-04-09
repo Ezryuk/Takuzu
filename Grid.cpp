@@ -52,17 +52,19 @@ void Grid::paintEvent(QPaintEvent *)
         QPen penYellow(Qt::yellow);
         penYellow.setWidth(3);
         _painter->setPen(penYellow);
-        if (_commonRows[i]!=_rows) {
-            rect = _rects[0][i];
-            _painter->drawRect(rect.x(), rect.y(), _rows*_widthRect, _widthRect);
-            rect = _rects[0][_commonRows[i]];
-            _painter->drawRect(rect.x(), rect.y(), _rows*_widthRect, _widthRect);
-        }
-        if (_commonColumns[i]!=_rows) {
-            rect = _rects[i][0];
-            _painter->drawRect(rect.x(), rect.y(), _widthRect, _rows*_widthRect);
-            rect = _rects[_commonColumns[i]][0];
-            _painter->drawRect(rect.x(), rect.y(), _widthRect, _rows*_widthRect);
+        for (int j = 0; j < _rows; j++) {
+            if (_commonRows[i*_rows+j]) {
+                rect = _rects[0][i];
+                _painter->drawRect(rect.x(), rect.y(), _rows*_widthRect, _widthRect);
+                rect = _rects[0][j];
+                _painter->drawRect(rect.x(), rect.y(), _rows*_widthRect, _widthRect);
+            }
+            if (_commonColumns[i*_rows+j]) {
+                rect = _rects[i][0];
+                _painter->drawRect(rect.x(), rect.y(), _widthRect, _rows*_widthRect);
+                rect = _rects[j][0];
+                _painter->drawRect(rect.x(), rect.y(), _widthRect, _rows*_widthRect);
+            }
         }
         _painter->setPen(*_pen);
     }
@@ -158,15 +160,15 @@ void Grid::setRows(int rows)
     _pawns = new Pawn[_rows*_rows];
     _invalidHorizontal = new bool[_rows];
     _invalidVertical = new bool[_rows];
-    _commonRows = new int[_rows];
-    _commonColumns = new int[_rows];
+    _commonRows = new bool[_rows*_rows];
+    _commonColumns = new bool[_rows*_rows];
 
     for (int i = 0; i < _rows; i++) {
         _invalidHorizontal[i] = false;
         _invalidVertical[i] = false;
-        _commonRows[i] = _rows;
-        _commonColumns[i] = _rows;
         for (int j = 0; j < _rows; j++) {
+            _commonRows[i*_rows+j] = false;
+            _commonColumns[i*_rows+j] = false;
             _initPawns[i*_rows+j] = false;
             _pawns[i*_rows+j] = Empty;
         }
@@ -213,27 +215,28 @@ void Grid::registerCommonPatterns(int first, int second, bool isVertical, bool i
     //qDebug() << first << " and " << second << " " << isOK << " vertical " << isVertical;
     if (isVertical) {
         if (isOK) {
-            _commonColumns[second] = first;
+            _commonColumns[second*_rows+first] = isOK;
+            _commonColumns[first*_rows+second] = isOK;
         } else {
             for (int i = 0; i < _rows; i++) {
-                if (_commonColumns[i] == first) {
-                    _commonColumns[i] = _rows;
+                if (_commonColumns[i*_rows+first]) {
+                    _commonColumns[i*_rows+first] = isOK;
                 }
+                _commonColumns[first*_rows+i] = isOK;
             }
-            _commonColumns[_commonColumns[first]] = _rows;
         }
-        _commonColumns[first] = second;
     } else {
         if (isOK) {
-            _commonRows[second] = first;
+            _commonRows[second*_rows+first] = isOK;
+            _commonRows[first*_rows+second] = isOK;
         } else {
             for (int i = 0; i < _rows; i++) {
-                if (_commonRows[i] == first) {
-                    _commonRows[i] = _rows;
+                if (_commonRows[i*_rows+first]) {
+                    _commonRows[i*_rows+first] = isOK;
                 }
+                _commonRows[first*_rows+i] = isOK;
             }
         }
-        _commonRows[first] = second;
     }
 }
 
