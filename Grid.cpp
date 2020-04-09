@@ -210,11 +210,16 @@ void Grid::registerOverThreeAdjacentPawns(int index, bool isVertical, bool isOk)
 
 void Grid::registerCommonPatterns(int first, int second, bool isVertical, bool isOK)
 {
-    qDebug() << first << " and " << second << " " << isOK << " vertical " << isVertical;
+    //qDebug() << first << " and " << second << " " << isOK << " vertical " << isVertical;
     if (isVertical) {
         if (isOK) {
             _commonColumns[second] = first;
         } else {
+            for (int i = 0; i < _rows; i++) {
+                if (_commonColumns[i] == first) {
+                    _commonColumns[i] = _rows;
+                }
+            }
             _commonColumns[_commonColumns[first]] = _rows;
         }
         _commonColumns[first] = second;
@@ -222,15 +227,13 @@ void Grid::registerCommonPatterns(int first, int second, bool isVertical, bool i
         if (isOK) {
             _commonRows[second] = first;
         } else {
-            _commonRows[_commonRows[first]] = _rows;
+            for (int i = 0; i < _rows; i++) {
+                if (_commonRows[i] == first) {
+                    _commonRows[i] = _rows;
+                }
+            }
         }
         _commonRows[first] = second;
-    }
-    for(int i = 0; i < _rows; i++) {
-        qDebug() << "col" << i << ": " << _commonColumns[i];
-    }
-    for(int i = 0; i < _rows; i++) {
-        qDebug() << "row" << i << ": " << _commonRows[i];
     }
 }
 
