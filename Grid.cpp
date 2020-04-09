@@ -21,6 +21,7 @@ void Grid::paintEvent(QPaintEvent *)
     _rowCountArea = new QRect[_rows*2];
     _columnCountArea = new QRect[_rows*2];
 
+    // Grid drawing
     for (int i = 0; i < _rows; ++i) {
         _rects[i] = new QRect[_rows];
         for (int j = 0; j < _rows; ++j) {
@@ -33,22 +34,8 @@ void Grid::paintEvent(QPaintEvent *)
         _columnCountArea[i*2+1] = QRect(i*_widthRect+_margin, (_rows+1)*_widthRect, _widthRect, _widthRect);
     }
 
-    // Erases valid rows before drawing in red invalid rows
+    // Draws in red invalid rows and highlights common rows
     QRect rect;
-    for (int i = 0; i < _rows; i++) {
-        if (!_invalidHorizontal[i]) {
-            for (int j = 0; j < _rows; j++) {
-                rect = _rects[j][i];
-                _painter->eraseRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3);
-            }
-        }
-        if (!_invalidVertical[i]) {
-            for (int j = 0; j < _rows; j++) {
-                rect = _rects[i][j];
-                _painter->eraseRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3);
-            }
-        }    
-    }
     for (int i = 0; i < _rows; i++) {
         if (_invalidHorizontal[i]) {
             for (int j = 0; j < _rows; j++) {
@@ -62,8 +49,21 @@ void Grid::paintEvent(QPaintEvent *)
                 _painter->fillRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3, QBrush(Qt::red));
             }
         }
+        QPen penYellow(Qt::yellow);
+        penYellow.setWidth(3);
+        _painter->setPen(penYellow);
+        if (_commonRows[i]) {
+            rect = _rects[0][i];
+            _painter->drawRect(rect.x(), rect.y(), _rows*_widthRect, _widthRect);
+        }
+        if (_commonColumns[i]) {
+            rect = _rects[i][0];
+            _painter->drawRect(rect.x(), rect.y(), _widthRect, _rows*_widthRect);
+        }
+        _painter->setPen(*_pen);
     }
 
+    // Pawns and counts drawing
     for (int i = 0; i < _rows; i++) {
         paintCount(true, i, _rowCounts[i*2], _rowCounts[i*2+1]);
         paintCount(false, i, _colCounts[i*2], _colCounts[i*2+1]);
@@ -71,6 +71,7 @@ void Grid::paintEvent(QPaintEvent *)
             paintPawn(i, j, _pawns[i*_rows+j]);
         }
     }
+
     _painter->end();
 }
 
@@ -153,10 +154,14 @@ void Grid::setRows(int rows)
     _pawns = new Pawn[_rows*_rows];
     _invalidHorizontal = new bool[_rows];
     _invalidVertical = new bool[_rows];
+    _commonRows = new bool[_rows];
+    _commonColumns = new bool[_rows];
 
     for (int i = 0; i < _rows; i++) {
         _invalidHorizontal[i] = false;
         _invalidVertical[i] = false;
+        _commonRows[i] = false;
+        _commonColumns[i] = false;
         for (int j = 0; j < _rows; j++) {
             _initPawns[i*_rows+j] = false;
             _pawns[i*_rows+j] = Empty;
@@ -202,6 +207,12 @@ void Grid::registerOverThreeAdjacentPawns(int index, bool isVertical, bool isOk)
 
 void Grid::registerCommonPatterns(int first, int second, bool isVertical, bool isOK)
 {
-
+    if (isVertical) {
+        _commonColumns[first] = isOK;
+        _commonColumns[second] = isOK;
+    } else {
+        _commonRows[first] = isOK;
+        _commonRows[second] = isOK;
+    }
 }
 
