@@ -88,10 +88,10 @@ void MainWindow::registerAboutPressed()
                              "(c) 2020 Christian Zheng and Quentin Derambure");
 }
 
-//QWidget *MainWindow::getGrid() const
-//{
-//    return _ui->gridWidget;
-//}
+QWidget *MainWindow::getGrid() const
+{
+    return _ui->gridWidget;
+}
 
 QToolButton *MainWindow::getRedoButton() const
 {

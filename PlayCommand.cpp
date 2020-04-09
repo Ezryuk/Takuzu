@@ -18,7 +18,7 @@ PlayCommand::~PlayCommand()
 
 void PlayCommand::undo()
 {
-    Pawn oldPawn = TakuzuUtils::permuteL(_pawn);
+    Pawn oldPawn = ModelTakuzu::permuteL(_pawn);
     _model->playAt(_row, _col, oldPawn);
 }
 

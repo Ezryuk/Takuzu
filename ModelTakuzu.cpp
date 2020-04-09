@@ -435,6 +435,7 @@ Pawn permuteL(Pawn p) {
 
 #endif
 
+#include <cassert>
 #include <iostream>
 #include <QtAlgorithms>
 #include <QDebug>
@@ -733,7 +734,12 @@ void ModelTakuzu::updateCount(int i, int j, Pawn oldPawn, Pawn newPawn)
                      _countPawn._Brow[i],
                      _countPawn._Bcol[j],
                      _countPawn._Wrow[i],
-                         _countPawn._Wcol[j]);
+                     _countPawn._Wcol[j]);
+}
+
+Pawn ModelTakuzu::getPawn(int i, int j) const
+{
+    return _currentGrid[i * _sizeMap + j];
 }
 
 void ModelTakuzu::registerPlayAt(int i, int j)

@@ -108,7 +108,7 @@ private: // attributes
 enum Pawn : unsigned char { Empty, Black, White};
 using Grid_ = std::vector<Pawn>;
 
-class ModelTakuzu : QObject {
+class ModelTakuzu : public QObject {
     Q_OBJECT
 public: // types
     enum Difficulty : unsigned char {
@@ -128,8 +128,8 @@ public: // methods
     bool rowIsValid(int i);
     bool colIsValid(int j);
     void initCount();
-//    void updateCount();
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
+    Pawn getPawn(int i, int j) const;
 
 public: // attributes
     Grid_ _currentGrid;
