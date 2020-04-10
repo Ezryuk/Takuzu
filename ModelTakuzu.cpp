@@ -164,6 +164,15 @@ bool ModelTakuzu::positionIsValid(int i, int j)
         emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, !isOK);
     }
 
+    std::cout << "repetition in row: " << repetitionInRow <<
+                 "\n repetition in col: " << repetitionInCol <<
+                 "\n oneOtherIdenticalRow: " << oneOtherIdenticalRow <<
+                 "\n oneOtherIdenticalCol: " << oneOtherIdenticalCol <<
+                 "\n bool valuation: ----" << (!repetitionInRow &&
+                                               !repetitionInCol &&
+                                               (oneOtherIdenticalRow == _sizeMap) &&
+                                               (oneOtherIdenticalCol == _sizeMap)) << "\n\n";
+
     return (!repetitionInRow &&
             !repetitionInCol &&
             (oneOtherIdenticalRow == _sizeMap) &&
@@ -253,13 +262,21 @@ Pawn ModelTakuzu::getPawn(int i, int j) const
 
 bool ModelTakuzu::doFinalCheck()
 {
-    std::vector<bool> isValid(_sizeMap * _sizeMap);
+    std::vector<bool> isValid;
     for(int i = 0; i < _sizeMap; ++i) {
         for(int j = 0; j < _sizeMap; ++j) {
             isValid.push_back(positionIsValid(i, j));
         }
     }
-    return std::all_of(isValid.begin(), isValid.end(), [](bool b)-> bool {return b;});
+    for(int i = 0; i < _sizeMap; ++i) {
+        for(int j = 0; j < _sizeMap; ++j) {
+            std::cout << isValid[i * _sizeMap + j] << " ";
+        }
+        std::cout << "\n";
+    }
+    return std::all_of(_currentGrid.begin(), _currentGrid.end(),
+                       [](Pawn p)->bool { return (p != Empty);})
+    && std::all_of(isValid.begin(), isValid.end(), [](bool b)-> bool {return b;});
 }
 
 void ModelTakuzu::registerPlayAt(int i, int j)

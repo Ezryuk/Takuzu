@@ -6,6 +6,7 @@
 
 #include "ModelTakuzu.h"
 #include "MainWindow.h"
+
 class PresenterTakuzu : public QObject
 {
     Q_OBJECT
