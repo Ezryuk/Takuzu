@@ -523,7 +523,6 @@ void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
     }
     _difficulty = difficulty;
     _sizeMap = size;
-    _currentGrid = Grid_(_sizeMap * _sizeMap);
     loadFile(QString(name));
     setRandomMap();
 }
@@ -534,8 +533,8 @@ int ModelTakuzu::setMap(int chosenMap)
                  " Size map: " << _sizeMap << "\n";
     assert((_nbMaps != -1 || _sizeMap != -1) && \
            "Choose a map pool before using setRandomMap().");
-    // load a fresh new grid in _current grid
-    _currentGrid = Grid_(_grids[chosenMap]);
+    _chosenMap = chosenMap;
+    _currentGrid = _grids[chosenMap];
     _countPawn = {
         std::vector<int>(_sizeMap),
         std::vector<int>(_sizeMap),
@@ -544,11 +543,9 @@ int ModelTakuzu::setMap(int chosenMap)
     };
     for(int i = 0; i < _sizeMap; ++i) {
         for (int j = 0; j < _sizeMap; ++j) {
-            emit notifyInitialPawn(i, j, _grids[chosenMap][i * _sizeMap + j]);
+            emit notifyInitialPawn(i, j, _grids[chosenMap][i * _sizeMap + j]); // do not use cAt(i, j) here
         }
     }
-
-    _chosenMap = chosenMap;
     initCount();
     return _chosenMap;
 }
@@ -566,76 +563,21 @@ void ModelTakuzu::playAt(int i, int j, Pawn pawn)
     std::cout << "call playAt with params " << i << " and " << j << "\n";
     assert((!_currentGrid.empty()) && \
            "Set a map using setRandomMap() before calling playAt().");
-    Pawn oldPawn = _currentGrid[i * _sizeMap + j];
+    Pawn oldPawn = pawnAt(i, j);
     Pawn newPawn = pawn;
     updateCount(i, j, oldPawn, newPawn);
-    _currentGrid[i * _sizeMap + j] = newPawn;
+    pawnAt(i, j) = newPawn;
     positionIsValid(i, j);
     emit notifyNewPawn(i, j, pawn);
-    emit notifyEndGame();
 }
 
 bool ModelTakuzu::positionIsValid(int i, int j)
 {
-
-
-    std::vector<Pawn> rowToScan(_sizeMap);
-    std::copy(_currentGrid.begin() + i * _sizeMap,
-              _currentGrid.begin() + (i + 1) * _sizeMap,
-              rowToScan.begin());
-
-    std::vector<Pawn> colToScan(_sizeMap);
-    for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {
-        colToScan[rowIndex] = _currentGrid[rowIndex * _sizeMap + j];
-    }
-
-    static auto isBBBorWWWpresentIn = [this](std::vector<Pawn> &vec) -> bool {
-        static std::vector<Pawn> vecBBB = {Black, Black, Black};
-        static std::vector<Pawn> vecWWW = {White, White, White};
-        auto itB = std::search(vec.cbegin(), vec.cend(), vecBBB.cbegin(), vecBBB.cend());
-        auto itW = std::search(vec.cbegin(), vec.cend(), vecWWW.cbegin(), vecWWW.cend());
-        return (itB != vec.cend() || itW != vec.cend());
-    };
-    bool repetitionInRow = isBBBorWWWpresentIn(rowToScan);
-    bool repetitionInCol = isBBBorWWWpresentIn(colToScan);
-
-
-    static auto findFirstIdenticalRow = [this](int i, std::vector<Pawn> rowToScan) -> int {
-        for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {
-            if (rowIndex != i) {
-                if (std::equal(_currentGrid.cbegin() + rowIndex * _sizeMap,
-                           _currentGrid.cbegin() + (rowIndex + 1) * _sizeMap,
-                               rowToScan.cbegin())) {
-                    return rowIndex; // we have found two identical rows
-                }
-            }
-        }
-        return _sizeMap; // we reached the end of rows list, no similarities found
-    };
-
-    static auto findFirstIdenticalCol = [this](int j, std::vector<Pawn> colToScan) -> int {
-        for (int colIndex = 0; colIndex < _sizeMap; ++colIndex) {
-            if (colIndex != j) {
-                // let's compare our column with each other column one by one
-                int commonThreshold = 0;
-                // compare from up to down cell by cell
-                while ((colToScan[commonThreshold] ==
-                        _currentGrid[commonThreshold * _sizeMap + colIndex]) &&
-                       commonThreshold < _sizeMap) {
-                    commonThreshold++;
-                }
-                // if we reached at the end, it means our two cols are the same
-                if (commonThreshold == _sizeMap) {
-                    // we found two identical columns
-                    return colIndex;
-                }
-            }
-        }
-        return _sizeMap;
-    };
-
     const bool isVertical = true;
     const bool isOK = true;
+
+    bool repetitionInRow = isBBBorWWWpresentIn(getRow(i));
+    bool repetitionInCol = isBBBorWWWpresentIn(getCol(j));
     if (repetitionInRow) {
         emit notifyOverThreeAdjacentPawns(i, !isVertical, !isOK);
     } else /* !repetitionInRow */ {
@@ -647,8 +589,8 @@ bool ModelTakuzu::positionIsValid(int i, int j)
         emit notifyOverThreeAdjacentPawns(j, isVertical, isOK);
     }
 
-    int oneOtherIdenticalRow = findFirstIdenticalRow(i, rowToScan);
-    int oneOtherIdenticalCol = findFirstIdenticalCol(j, colToScan);
+    int oneOtherIdenticalRow = findFirstIdenticalRowTo(i);
+    int oneOtherIdenticalCol = findFirstIdenticalColTo(j);
     static auto oneOtherIdenticalRowColIsFound = [this](int index) -> bool {
         return (index != _sizeMap);
     };
@@ -763,7 +705,7 @@ bool ModelTakuzu::doFinalCheck()
 
 void ModelTakuzu::registerPlayAt(int i, int j)
 {
-    Pawn nextPawn = permuteR(_currentGrid[i * _sizeMap + j]);
+    Pawn nextPawn = permuteR(pawnAt(i, j));
     playAt(i, j, nextPawn);
 }
 
@@ -775,8 +717,7 @@ void ModelTakuzu::registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int 
 void ModelTakuzu::registerAttemptToEndGame()
 {
     bool win = doFinalCheck();
-    if (win)
-        emit notifyEndGame();
+    emit notifyEndGame(win);
 }
 
 
@@ -800,3 +741,73 @@ Pawn ModelTakuzu::toPawn(QChar letter)
     default: return Empty;
     }
 }
+
+Pawn &ModelTakuzu::pawnAt(int i, int j)
+{
+    assert(_chosenMap != -1 &&
+            "A map should be chosen before trying to access to _currentGrid.");
+    return _currentGrid[i * _sizeMap + j];
+}
+
+Pawn ModelTakuzu::pawnAt(int i, int j) const
+{
+    assert(_chosenMap != -1 &&
+            "A map should be chosen before trying to access to _currentGrid.");
+    return _currentGrid[i * _sizeMap + j];
+}
+
+std::vector<Pawn> ModelTakuzu::getRow(int i) const
+{
+    return std::vector<Pawn>(_currentGrid.begin() + i * _sizeMap,
+                             _currentGrid.begin() + (i + 1) * _sizeMap);
+}
+
+std::vector<Pawn> ModelTakuzu::getCol(int j) const
+{
+    std::vector<Pawn> column;
+    for (int row = 0; row < _sizeMap; ++row) {
+        column.push_back(pawnAt(row, j));
+    }
+    return column;
+}
+
+bool ModelTakuzu::isBBBorWWWpresentIn(std::vector<Pawn> vec)
+{
+    static std::vector<Pawn> vecBBB = {Black, Black, Black};
+    static std::vector<Pawn> vecWWW = {White, White, White};
+    auto itB = std::search(vec.cbegin(), vec.cend(), vecBBB.cbegin(), vecBBB.cend());
+    auto itW = std::search(vec.cbegin(), vec.cend(), vecWWW.cbegin(), vecWWW.cend());
+    return (itB != vec.cend() || itW != vec.cend());
+}
+
+int ModelTakuzu::findFirstIdenticalRowTo(int i) const
+{
+    std::vector<Pawn> rowToScan = getRow(i);
+    for (int rowIndex = 0; rowIndex < _sizeMap;++rowIndex) {
+        if (rowIndex != i) {
+            if (std::equal(_currentGrid.cbegin() + rowIndex * _sizeMap,
+                       _currentGrid.cbegin() + (rowIndex + 1) * _sizeMap,
+                           rowToScan.cbegin())) {
+                return rowIndex; // we have found two identical rows
+            }
+        }
+    }
+    return _sizeMap; // we reached the end of rows list, no similarities found
+}
+
+int ModelTakuzu::findFirstIdenticalColTo(int j) const
+{
+    std::vector<Pawn> colToScan = getCol(j);
+    for (int colIndex = 0; colIndex < _sizeMap; ++colIndex) {
+        if (colIndex != j) {
+            std::vector<Pawn> otherCol = getCol(colIndex);
+            if (std::equal(colToScan.begin(), colToScan.end(),
+                           otherCol.begin(), otherCol.end())) {
+                return colIndex;
+            }
+        }
+    }
+    return _sizeMap;
+}
+
+

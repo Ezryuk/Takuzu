@@ -134,14 +134,7 @@ public: // methods
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
     Pawn getPawn(int i, int j) const;
     bool doFinalCheck(); // no const because positionIsValid(int,int) no const
-public: // attributes
-    Grid_ _currentGrid;
-    struct {
-        std::vector<int> _Wrow;
-        std::vector<int> _Brow;
-        std::vector<int> _Wcol;
-        std::vector<int> _Bcol;
-    } _countPawn;
+
 signals:
     void notifyNewPawn(int i, int j, Pawn newPawn);
     void notifyCount(int i, int j, int Brow, int Bcol, int Wrow, int Wcol);
@@ -149,7 +142,8 @@ signals:
     void notifyInitialPawn(int i, int j, Pawn readOnlyPawn);
     void notifyOverThreeAdjacentPawns(int index, bool isVertical, bool isOK); // "!isVertical = isHorizontal"
     void notifyCommonPatterns(int first, int second, bool isVertical, bool isOK);
-    void notifyEndGame();
+    void notifyEndGame(bool win);
+
 public slots:
     void registerPlayAt(int i, int j);
     void registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
@@ -159,6 +153,13 @@ private: // methods
     void loadFile(const QString &name);
     static QChar toQChar(Pawn pawn);
     static Pawn toPawn(QChar letter);
+    Pawn &pawnAt(int i, int j);
+    Pawn pawnAt(int i, int j) const;
+    std::vector<Pawn> getRow(int i) const;
+    std::vector<Pawn> getCol(int j) const;
+    static bool isBBBorWWWpresentIn(std::vector<Pawn> vec);
+    int findFirstIdenticalRowTo(int i) const;
+    int findFirstIdenticalColTo(int j) const;
 
 private: // attributes
     int _nbMaps;
@@ -166,7 +167,13 @@ private: // attributes
     Difficulty _difficulty;
     Grid_ *_grids;
     int _chosenMap;
-
+    Grid_ _currentGrid;
+    struct {
+        std::vector<int> _Wrow;
+        std::vector<int> _Brow;
+        std::vector<int> _Wcol;
+        std::vector<int> _Bcol;
+    } _countPawn;
 };
 
 #endif // MODELTAKUZU_H

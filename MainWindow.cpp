@@ -88,12 +88,14 @@ void MainWindow::registerAboutPressed()
                              "(c) 2020 Christian Zheng and Quentin Derambure");
 }
 
-void MainWindow::registerEndGame()
+void MainWindow::registerEndGame(bool win)
 {
-    _chrono->stop();
-    QMessageBox::information(this, "Victory !", "You won the game in "
-                             + QString::number(_time->minute()) + " minutes and "
-                             + QString::number(_time->second()) + " !");
+    if (win) {
+        _chrono->stop();
+        QMessageBox::information(this, "Victory !", "You won the game in "
+                                 + QString::number(_time->minute()) + " minutes and "
+                                 + QString::number(_time->second()) + " !");
+    }
 }
 
 QWidget *MainWindow::getGrid() const

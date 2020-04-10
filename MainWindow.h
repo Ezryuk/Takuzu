@@ -32,7 +32,7 @@ public slots:
     void registerQuitPressed();
     void registerRulesPressed();
     void registerAboutPressed();
-    void registerEndGame();
+    void registerEndGame(bool win);
 
 private:
     Ui::MainWindow* _ui;
