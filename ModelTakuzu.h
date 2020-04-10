@@ -149,10 +149,11 @@ signals:
     void notifyInitialPawn(int i, int j, Pawn readOnlyPawn);
     void notifyOverThreeAdjacentPawns(int index, bool isVertical, bool isOK); // "!isVertical = isHorizontal"
     void notifyCommonPatterns(int first, int second, bool isVertical, bool isOK);
-    void notifyGameEnd(bool win);
+    void notifyEndGame();
 public slots:
     void registerPlayAt(int i, int j);
     void registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
+    void registerAttemptToEndGame();
 
 private: // methods
     void loadFile(const QString &name);
