@@ -4,7 +4,6 @@
 #include <QInputDialog>
 #include <QPropertyAnimation>
 #include <QTimer>
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

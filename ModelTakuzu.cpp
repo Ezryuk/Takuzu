@@ -56,7 +56,6 @@ void ModelTakuzu::loadFile(const QString &name)
                       << "Make sure the file has the same path as the executable.\n";
         }
         // allocate the grids
-        delete[] _grids;
         _grids = new Grid_[_nbMaps];
         for (int i = 0; i < _nbMaps; ++i) {
             _grids[i] = Grid_(_sizeMap * _sizeMap);
@@ -106,7 +105,7 @@ int ModelTakuzu::setMap(int chosenMap)
     };
     for(int i = 0; i < _sizeMap; ++i) {
         for (int j = 0; j < _sizeMap; ++j) {
-            emit notifyInitialPawn(i, j, _grids[chosenMap][i * _sizeMap + j]); // do not use pawnAt(i, j) here
+            emit notifyInitialPawn(i, j, _grids[chosenMap][i * _sizeMap + j]); // do not use cAt(i, j) here
         }
     }
     initCount();
@@ -165,6 +164,15 @@ bool ModelTakuzu::positionIsValid(int i, int j)
     } else {
         emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, !isOK);
     }
+
+    std::cout << "repetition in row: " << repetitionInRow <<
+                 "\n repetition in col: " << repetitionInCol <<
+                 "\n oneOtherIdenticalRow: " << oneOtherIdenticalRow <<
+                 "\n oneOtherIdenticalCol: " << oneOtherIdenticalCol <<
+                 "\n bool valuation: ----" << (!repetitionInRow &&
+                                               !repetitionInCol &&
+                                               (oneOtherIdenticalRow == _sizeMap) &&
+                                               (oneOtherIdenticalCol == _sizeMap)) << "\n\n";
 
     return (!repetitionInRow &&
             !repetitionInCol &&
@@ -261,7 +269,12 @@ bool ModelTakuzu::doFinalCheck()
             isValid.push_back(positionIsValid(i, j));
         }
     }
-
+    for(int i = 0; i < _sizeMap; ++i) {
+        for(int j = 0; j < _sizeMap; ++j) {
+            std::cout << isValid[i * _sizeMap + j] << " ";
+        }
+        std::cout << "\n";
+    }
     std::vector<std::vector<Pawn>> rowsAndCols;
     for (int i = 0; i < _sizeMap; ++i) {
         rowsAndCols.push_back(getRow(i));
@@ -273,6 +286,7 @@ bool ModelTakuzu::doFinalCheck()
        counterOcc.push_back(std::count(vec.begin(), vec.end(), Black));
        counterOcc.push_back(std::count(vec.begin(), vec.end(), White));
     });
+
 
     return (std::all_of(_currentGrid.begin(), _currentGrid.end(),
                        [](Pawn p)->bool { return (p != Empty);}) &&
