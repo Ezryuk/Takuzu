@@ -68,8 +68,9 @@ void ModelTakuzu::loadFile(const QString &name)
             int letterIndex = 0;
             QChar letter;
             foreach(letter, line) {
-                if (letterIndex < _sizeMap * _sizeMap)
+                if (letterIndex < _sizeMap * _sizeMap) {
                     _grids[i][letterIndex++] = ModelTakuzu::toPawn(letter);
+                }
             }
             i++;
         }
@@ -105,7 +106,7 @@ int ModelTakuzu::setMap(int chosenMap)
     };
     for(int i = 0; i < _sizeMap; ++i) {
         for (int j = 0; j < _sizeMap; ++j) {
-            emit notifyInitialPawn(i, j, _grids[chosenMap][i * _sizeMap + j]); // do not use cAt(i, j) here
+            emit notifyInitialPawn(i, j, _grids[chosenMap][i * _sizeMap + j]); // do not use pawnAt(i, j) here
         }
     }
     initCount();
@@ -164,15 +165,6 @@ bool ModelTakuzu::positionIsValid(int i, int j)
     } else {
         emit notifyCommonPatterns(j, oneOtherIdenticalCol, isVertical, !isOK);
     }
-
-    std::cout << "repetition in row: " << repetitionInRow <<
-                 "\n repetition in col: " << repetitionInCol <<
-                 "\n oneOtherIdenticalRow: " << oneOtherIdenticalRow <<
-                 "\n oneOtherIdenticalCol: " << oneOtherIdenticalCol <<
-                 "\n bool valuation: ----" << (!repetitionInRow &&
-                                               !repetitionInCol &&
-                                               (oneOtherIdenticalRow == _sizeMap) &&
-                                               (oneOtherIdenticalCol == _sizeMap)) << "\n\n";
 
     return (!repetitionInRow &&
             !repetitionInCol &&
@@ -268,12 +260,6 @@ bool ModelTakuzu::doFinalCheck()
         for(int j = 0; j < _sizeMap; ++j) {
             isValid.push_back(positionIsValid(i, j));
         }
-    }
-    for(int i = 0; i < _sizeMap; ++i) {
-        for(int j = 0; j < _sizeMap; ++j) {
-            std::cout << isValid[i * _sizeMap + j] << " ";
-        }
-        std::cout << "\n";
     }
     std::vector<std::vector<Pawn>> rowsAndCols;
     for (int i = 0; i < _sizeMap; ++i) {
