@@ -49,9 +49,9 @@ void Grid::paintEvent(QPaintEvent *)
                 _painter->fillRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3, QBrush(Qt::red));
             }
         }
-        QPen penYellow(Qt::yellow);
-        penYellow.setWidth(3);
-        _painter->setPen(penYellow);
+        QPen penOrange(QColor("#ffb000"));
+        penOrange.setWidth(3);
+        _painter->setPen(penOrange);
         for (int j = 0; j < _rows; j++) {
             if (_commonRows[i*_rows+j]) {
                 rect = _rects[0][i];

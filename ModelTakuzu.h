@@ -143,7 +143,6 @@ signals:
     void notifyOverThreeAdjacentPawns(int index, bool isVertical, bool isOK); // "!isVertical = isHorizontal"
     void notifyCommonPatterns(int first, int second, bool isVertical, bool isOK);
     void notifyEndGame(bool win);
-
 public slots:
     void registerPlayAt(int i, int j);
     void registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
