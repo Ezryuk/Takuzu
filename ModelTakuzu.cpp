@@ -749,6 +749,17 @@ Pawn ModelTakuzu::getPawn(int i, int j) const
     return _currentGrid[i * _sizeMap + j];
 }
 
+bool ModelTakuzu::doFinalCheck()
+{
+    std::vector<bool> isValid(_sizeMap * _sizeMap);
+    for(int i = 0; i < _sizeMap; ++i) {
+        for(int j = 0; j < _sizeMap; ++j) {
+            isValid.push_back(positionIsValid(i, j));
+        }
+    }
+    return std::all_of(isValid.begin(), isValid.end(), [](bool b)-> bool {return b;});
+}
+
 void ModelTakuzu::registerPlayAt(int i, int j)
 {
     Pawn nextPawn = permuteR(_currentGrid[i * _sizeMap + j]);

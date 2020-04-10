@@ -1,6 +1,8 @@
 #ifndef MODELTAKUZU_H
 #define MODELTAKUZU_H
+
 #if 0
+{
 #include <QObject>
 #include <QString>
 #include <ctime>
@@ -95,6 +97,7 @@ private: // attributes
     int _chosenMap;
 
 };
+}
 #endif
 
 #include <algorithm>
@@ -124,13 +127,13 @@ public: // methods
     int setMap(int chosenMap);
     int setRandomMap();
     void playAt(int i, int j, Pawn pawn);
-    bool positionIsValid(int i, int j);
+    bool positionIsValid(int i, int j); // no const due to emit signal
     bool rowIsValid(int i);
     bool colIsValid(int j);
     void initCount();
     void updateCount(int i, int j, Pawn oldPawn, Pawn newPawn);
     Pawn getPawn(int i, int j) const;
-
+    bool doFinalCheck(); // no const because positionIsValid(int,int) no const
 public: // attributes
     Grid_ _currentGrid;
     struct {
