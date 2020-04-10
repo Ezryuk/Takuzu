@@ -19,6 +19,7 @@ public:
 signals:
 public slots:
     void registerCommand(int i, int j);
+    void registerUndoRedoTriggered();
 private:
     QUndoStack *_undoStack;
 };
