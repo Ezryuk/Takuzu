@@ -25,6 +25,9 @@ The objective is to recreate the game of [Takuzu](https://en.wikipedia.org/wiki/
 
 ## Choices made regarding ergonomics
 
+Some useful keyboard shortcuts are implemented. A comprehensive list is accessible throught the interface.
+The window is easily resizable, and the grid stays at the center.
+
 ## Modeling choices
 
 For the architecture of our software, we have proceeded to a three-thirds division, Model-View-Presentation, coupled with a design-pattern Command(management of undo/redo).
