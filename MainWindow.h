@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <ModelTakuzu.h>
+#include <QMessageBox>
 
 namespace Ui {
 class MainWindow;
@@ -17,7 +18,6 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    void startChrono();
     ~MainWindow();
     QWidget *getGrid() const;
     QToolButton *getRedoButton() const;
@@ -27,9 +27,13 @@ public:
 
 signals:
     void notifyMapChosen(ModelTakuzu::Difficulty level, int size);
+    void notifySizeMapPicked(ModelTakuzu::Difficulty level, int size);
+    void notifMapPicked(int mapPicked);
 
 public slots:
     void registerSetNewGame();
+    void registerNewGamePicked();
+    void registerPickMap(int nbMaps);
     void registerChronoChanged();
     void registerQuitPressed();
     void registerRulesPressed();
@@ -42,6 +46,9 @@ private:
     Ui::MainWindow* _ui;
     QTime* _time;
     QTimer* _chrono;
+
+    QMessageBox::StandardButton setGame(ModelTakuzu::Difficulty &difficulty, QString &size);
+    void startChrono();
 };
 
 #endif // MAINWINDOW_H*/

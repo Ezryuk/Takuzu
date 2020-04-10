@@ -2,9 +2,9 @@
 #include "ui_MainWindow.h"
 #include <QGraphicsEffect>
 #include <QInputDialog>
-#include <QMessageBox>
 #include <QPropertyAnimation>
 #include <QTimer>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->submitButton->setEnabled(false);
 
     connect(_ui->newGame, SIGNAL(triggered()), this, SLOT(registerSetNewGame()));
+    connect(_ui->newGamePicked, SIGNAL(triggered()), this, SLOT(registerNewGamePicked()));
     connect(_ui->actionQuit, SIGNAL(triggered()), this, SLOT(registerQuitPressed()));
     connect(_ui->actionRules, SIGNAL(triggered()), this, SLOT(registerRulesPressed()));
     connect(_ui->actionAbout, SIGNAL(triggered()), this, SLOT(registerAboutPressed()));
@@ -29,28 +30,60 @@ MainWindow::~MainWindow()
 
 void MainWindow::registerSetNewGame()
 {
+    QString size;
+    ModelTakuzu::Difficulty difficulty;
+    if (setGame(difficulty, size) == QMessageBox::Yes) {
+        _ui->gridWidget->setRows(size.toInt());
+        emit notifyMapChosen(difficulty, size.toInt());
+        startChrono();
+        _ui->submitButton->setEnabled(true);
+    }
+}
+
+void MainWindow::registerNewGamePicked()
+{
+    QString size;
+    ModelTakuzu::Difficulty difficulty;
+    if (setGame(difficulty, size) == QMessageBox::Yes) {
+        _ui->gridWidget->setRows(size.toInt());
+        emit notifySizeMapPicked(difficulty, size.toInt());
+    }
+}
+
+QMessageBox::StandardButton MainWindow::setGame(ModelTakuzu::Difficulty &difficulty, QString &size)
+{
     bool ok;
     QStringList sizes;
     sizes << "6" << "8" << "10";
-    QString size = QInputDialog::getItem(this, "Choose map size", "Size :", sizes, 0, false, &ok);
+    size = QInputDialog::getItem(this, "Choose map size", "Size :", sizes, 0, false, &ok);
     if (ok && !size.isEmpty()) {
         QStringList levels;
         levels << "Easy" << "Hard";
         QString level = QInputDialog::getItem(this, "Choose difficulty level", "Level :", levels, 0, false, &ok);
-        ModelTakuzu::Difficulty difficulty = level=="Easy"?ModelTakuzu::Difficulty::Easy:ModelTakuzu::Difficulty::Hard;
+        difficulty = level=="Easy"?ModelTakuzu::Difficulty::Easy:ModelTakuzu::Difficulty::Hard;
         if (ok && !level.isEmpty()) {
             QMessageBox::StandardButton button;
             button = QMessageBox::question(this, "Choices",
-                                           "You have chosen a "+size+"x"+size+" map with the difficulty '"+level+"'.\n"
+                                           "You have chosen a "+size+"x"+size+" grid with the difficulty '"+level+"'.\n"
                                            "Are you sure ?",
                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-            if (button == QMessageBox::Yes) {
-                _ui->gridWidget->setRows(size.toInt());
-                emit notifyMapChosen(difficulty, size.toInt());
-                startChrono();
-                _ui->submitButton->setEnabled(true);
-            }
+            return button;
         }
+    }
+}
+
+void MainWindow::registerPickMap(int nbMaps)
+{
+    bool ok;
+    QStringList maps;
+    for (int i = 1; i <= nbMaps; i++) {
+        maps << QString::number(i);
+    }
+    QString mapPicked = QInputDialog::getItem(this, "Choose one grid", "Grid number :", maps, 0, false, &ok);
+    if (ok && !mapPicked.isEmpty()) {
+        emit notifMapPicked(mapPicked.toInt()-1);
+        startChrono();
+        _ui->submitButton->setEnabled(true);
     }
 }
 
@@ -72,7 +105,7 @@ void MainWindow::registerNumberMap(ModelTakuzu::Difficulty difficulty, int sizeM
 {
     _ui->mapLabel->setText("Grid : " + QString::number(sizeMap)+ "x" + QString::number(sizeMap)
                            + " " + QString(difficulty) + " "
-                           + QString::number(chosenMap) + "/" + QString::number(nbMaps));
+                           + QString::number(chosenMap+1) + "/" + QString::number(nbMaps));
 }
 
 void MainWindow::registerQuitPressed()
@@ -127,7 +160,8 @@ void MainWindow::registerEndGame(bool winStatus)
 
 void MainWindow::registerShortcutsPressed()
 {
-    QMessageBox::information(this, "Shortcuts", "New Game : CTRL + N\n"
+    QMessageBox::information(this, "Shortcuts", "New Random Game : CTRL + N\n"
+                             "Pick One Grid : CTRL + P\n"
                              "Quit : CTRL + Q\n"
                              "Undo : CTRL + Z\n"
                              "Redo : CTRL + SHIFT + Z\n"

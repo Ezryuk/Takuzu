@@ -179,6 +179,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="newGame"/>
+    <addaction name="newGamePicked"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
@@ -203,7 +204,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="newGame">
    <property name="text">
-    <string>&amp;New Game...</string>
+    <string>&amp;New Random Game...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -211,7 +212,7 @@
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>&amp;Quit</string>
+    <string>&amp;Quit...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -219,17 +220,25 @@
   </action>
   <action name="actionRules">
    <property name="text">
-    <string>&amp;Rules</string>
+    <string>&amp;Rules...</string>
    </property>
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>&amp;About</string>
+    <string>&amp;About...</string>
    </property>
   </action>
   <action name="actionShortcuts">
    <property name="text">
-    <string>&amp;Shortcuts</string>
+    <string>&amp;Shortcuts...</string>
+   </property>
+  </action>
+  <action name="newGamePicked">
+   <property name="text">
+    <string>&amp;Pick One Grid...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>

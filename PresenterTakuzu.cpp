@@ -7,6 +7,9 @@ PresenterTakuzu::PresenterTakuzu(QObject *parent) : QObject(parent)
     _view = new MainWindow();
     _view->show();
     connect(_view, SIGNAL(notifyMapChosen(ModelTakuzu::Difficulty,int)), _model, SLOT(registerChooseMapPool(ModelTakuzu::Difficulty,int)));
+    connect(_view, SIGNAL(notifySizeMapPicked(ModelTakuzu::Difficulty,int)), _model, SLOT(registerSizeMapPicked(ModelTakuzu::Difficulty,int)));
+    connect(_model, SIGNAL(notifyNbMaps(int)), _view, SLOT(registerPickMap(int)));
+    connect(_view, SIGNAL(notifMapPicked(int)), _model, SLOT(registerChooseMapPicked(int)));
     connect(_model, SIGNAL(notifyNumberMap(ModelTakuzu::Difficulty,int,int,int)), _view, SLOT(registerNumberMap(ModelTakuzu::Difficulty,int,int,int)));
     connect(_view->getGrid(), SIGNAL(notifyCoordinatesClicked(int,int)), _model, SLOT(registerPlayAt(int,int)));
     connect(_model, SIGNAL(notifyCount(int,int,int,int,int,int)), _view->getGrid(), SLOT(registerCount(int,int,int,int,int,int)));

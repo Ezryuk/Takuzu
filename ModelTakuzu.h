@@ -44,9 +44,12 @@ signals:
     void notifyCommonPatterns(int first, int second, bool isVertical, bool isOK);
     void notifyEndGame(bool win);
     void notifyNumberMap(ModelTakuzu::Difficulty difficulty, int sizeMap, int chosenMap, int nbMaps);
+    void notifyNbMaps(int nbMaps);
 public slots:
     void registerPlayAt(int i, int j);
     void registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
+    void registerSizeMapPicked(ModelTakuzu::Difficulty difficulty, int size);
+    void registerChooseMapPicked(int mapPicked);
     void registerAttemptToEndGame();
 
 private: // methods

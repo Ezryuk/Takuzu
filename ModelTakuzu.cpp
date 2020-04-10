@@ -305,6 +305,27 @@ void ModelTakuzu::registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int 
     chooseMapPool(difficulty, size);
 }
 
+void ModelTakuzu::registerSizeMapPicked(ModelTakuzu::Difficulty difficulty, int size)
+{
+    QString name = QString::number(size);
+    if (difficulty == Easy) {
+        name.append("_easy.txt");
+    } else /* (difficulty == Hard) */ {
+        name.append("_hard.txt");
+    }
+    _difficulty = difficulty;
+    _sizeMap = size;
+    loadFile(QString(name));
+    emit notifyNbMaps(_nbMaps);
+}
+
+void ModelTakuzu::registerChooseMapPicked(int mapPicked)
+{
+    _chosenMap = mapPicked;
+    setMap(_chosenMap);
+    emit notifyNumberMap(_difficulty, _sizeMap, _chosenMap, _nbMaps);
+}
+
 void ModelTakuzu::registerAttemptToEndGame()
 {
     bool win = doFinalCheck();
