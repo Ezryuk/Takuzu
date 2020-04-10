@@ -1,6 +1,5 @@
 #include "PresenterTakuzu.h"
 #include "PlayCommand.h"
-#include <QDebug>
 
 PresenterTakuzu::PresenterTakuzu(QObject *parent) : QObject(parent)
 {

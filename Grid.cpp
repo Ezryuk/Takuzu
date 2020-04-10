@@ -1,5 +1,4 @@
 #include "Grid.h"
-#include <QDebug>
 
 Grid::Grid(QWidget *parent) : QWidget(parent)
 {
@@ -21,7 +20,7 @@ void Grid::paintEvent(QPaintEvent *)
     _rowCountArea = new QRect[_rows*2];
     _columnCountArea = new QRect[_rows*2];
 
-    // Grid drawing
+    // Draws grid
     for (int i = 0; i < _rows; ++i) {
         _rects[i] = new QRect[_rows];
         for (int j = 0; j < _rows; ++j) {
@@ -34,7 +33,7 @@ void Grid::paintEvent(QPaintEvent *)
         _columnCountArea[i*2+1] = QRect(i*_widthRect+_margin, (_rows+1)*_widthRect+5, _widthRect, _widthRect);
     }
 
-    // Draws in red invalid rows and highlights common rows
+    // Draws in red invalid rows and highlights common rows in orange
     QRect rect;
     for (int i = 0; i < _rows; i++) {
         if (_invalidHorizontal[i]) {
@@ -69,7 +68,7 @@ void Grid::paintEvent(QPaintEvent *)
         _painter->setPen(*_pen);
     }
 
-    // Pawns and counts drawing
+    // Draws pawns and counts
     for (int i = 0; i < _rows; i++) {
         paintCount(true, i, _rowCounts[i*2], _rowCounts[i*2+1]);
         paintCount(false, i, _colCounts[i*2], _colCounts[i*2+1]);
@@ -98,6 +97,7 @@ void Grid::paintPawn(int row, int column, Pawn p) {
         _painter->eraseRect(rect.x()+3, rect.y()+3, rect.width()-3, rect.height()-3);
         break;
     }
+    // If initial pawns, the pawn is surrounded in blue
     if (_initPawns[row*_rows+column]) {
         QPen penInit(Qt::blue);
         penInit.setWidth(3);

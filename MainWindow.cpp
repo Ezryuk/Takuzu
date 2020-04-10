@@ -1,6 +1,5 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include <QDebug>
 #include <QGraphicsEffect>
 #include <QInputDialog>
 #include <QMessageBox>
