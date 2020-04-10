@@ -22,7 +22,7 @@ PresenterTakuzu::PresenterTakuzu(QObject *parent) : QObject(parent)
     connect(_view->getUndoButton(), SIGNAL(triggered(QAction*)), this, SLOT(registerUndoRedoTriggered()));
     connect(_view->getRedoButton(), SIGNAL(triggered(QAction*)), this, SLOT(registerUndoRedoTriggered()));
     connect(_view->getSubmitButton(), SIGNAL(clicked()), _model, SLOT(registerAttemptToEndGame()));
-    connect(_model, SIGNAL(notifyGameEnd(bool)), _view, SLOT(registerEndGame(bool)));
+    connect(_model, SIGNAL(notifyEndGame(bool)), _view, SLOT(registerEndGame(bool)));
 }
 
 PresenterTakuzu::~PresenterTakuzu()

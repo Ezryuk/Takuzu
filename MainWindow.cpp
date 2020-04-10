@@ -3,6 +3,9 @@
 #include <QInputDialog>
 #include <QTimer>
 #include <QMessageBox>
+#include <QDebug>
+#include <QGraphicsEffect>
+#include <QPropertyAnimation>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -95,6 +98,19 @@ void MainWindow::registerEndGame(bool winStatus)
         QMessageBox::information(this, "Victory !", "You won the game in "
                                  + QString::number(_time->minute()) + " minutes and "
                                  + QString::number(_time->second()) + " seconds !");
+    } else {
+        _ui->incorrectLabel->setText("The grid is not correctly filled.");
+        QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect();
+        _ui->incorrectLabel->setGraphicsEffect(effect);
+        QPropertyAnimation *animation = new QPropertyAnimation(effect,"opacity");
+        animation->setDuration(3000);
+        animation->setStartValue(1.0);
+        animation->setEndValue(0.0);
+        animation->setEasingCurve(QEasingCurve::OutQuad);
+        connect(animation, &QPropertyAnimation::finished, [=](){
+            _ui->incorrectLabel->setText("");
+        });
+        animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
 }
 
