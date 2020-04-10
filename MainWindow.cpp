@@ -98,9 +98,10 @@ void MainWindow::registerEndGame(bool winStatus)
 {
     if (winStatus) {
         _chrono->stop();
+        QTime endTime = QTime(0,0).addMSecs(_time->elapsed());
         QMessageBox::information(this, "Victory !", "You won the game in "
-                                 + QString::number(_time->minute()) + " minutes and "
-                                 + QString::number(_time->second()) + " seconds !");
+                                 + QString::number(endTime.minute()) + " minutes and "
+                                 + QString::number(endTime.second()) + " seconds !");
     } else {
         _ui->incorrectLabel->setText("The grid is not correctly filled.");
         QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect();

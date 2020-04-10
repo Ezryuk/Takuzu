@@ -51,6 +51,9 @@
         <property name="text">
          <string>Undo</string>
         </property>
+        <property name="shortcut">
+         <string>Ctrl+Z</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -73,6 +76,9 @@
        <widget class="QToolButton" name="redoButton">
         <property name="text">
          <string>Redo</string>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+Shift+Z</string>
         </property>
        </widget>
       </item>
@@ -175,10 +181,16 @@
    <property name="text">
     <string>&amp;New Game...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionQuit">
    <property name="text">
     <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionRules">
