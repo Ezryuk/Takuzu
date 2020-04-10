@@ -28,10 +28,10 @@ void Grid::paintEvent(QPaintEvent *)
             _rects[i][j] = QRect(i*_widthRect+_margin, j*_widthRect, _widthRect, _widthRect);
             _painter->drawRect(_rects[i][j]);
         }
-        _rowCountArea[i*2] = QRect(_rows*_widthRect+_margin, i*_widthRect, _widthRect, _widthRect);
-        _columnCountArea[i*2] = QRect(i*_widthRect+_margin, _rows*_widthRect, _widthRect, _widthRect);
-        _rowCountArea[i*2+1] = QRect((_rows+1)*_widthRect+_margin, i*_widthRect, _widthRect, _widthRect);
-        _columnCountArea[i*2+1] = QRect(i*_widthRect+_margin, (_rows+1)*_widthRect, _widthRect, _widthRect);
+        _rowCountArea[i*2] = QRect(_rows*_widthRect+_margin+5, i*_widthRect, _widthRect, _widthRect);
+        _columnCountArea[i*2] = QRect(i*_widthRect+_margin, _rows*_widthRect+5, _widthRect, _widthRect);
+        _rowCountArea[i*2+1] = QRect((_rows+1)*_widthRect+_margin+5, i*_widthRect, _widthRect, _widthRect);
+        _columnCountArea[i*2+1] = QRect(i*_widthRect+_margin, (_rows+1)*_widthRect+5, _widthRect, _widthRect);
     }
 
     // Draws in red invalid rows and highlights common rows

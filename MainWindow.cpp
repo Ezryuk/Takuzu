@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     _ui->setupUi(this);
 
+    _ui->submitButton->setEnabled(false);
+
     connect(_ui->newGame, SIGNAL(triggered()), this, SLOT(registerSetNewGame()));
     connect(_ui->actionQuit, SIGNAL(triggered()), this, SLOT(registerQuitPressed()));
     connect(_ui->actionRules, SIGNAL(triggered()), this, SLOT(registerRulesPressed()));
@@ -46,6 +48,7 @@ void MainWindow::registerSetNewGame()
                 _ui->gridWidget->setRows(size.toInt());
                 emit notifyMapChosen(difficulty, size.toInt());
                 startChrono();
+                _ui->submitButton->setEnabled(true);
             }
         }
     }
