@@ -1,6 +1,7 @@
 #include "ModelTakuzu.h"
 #include <cassert>
 #include <iostream>
+#include <set>
 #include <QtAlgorithms>
 #include <QFile>
 #include <QTextStream>
@@ -274,9 +275,23 @@ bool ModelTakuzu::doFinalCheck()
         }
         std::cout << "\n";
     }
-    return std::all_of(_currentGrid.begin(), _currentGrid.end(),
-                       [](Pawn p)->bool { return (p != Empty);})
-    && std::all_of(isValid.begin(), isValid.end(), [](bool b)-> bool {return b;});
+    std::vector<std::vector<Pawn>> rowsAndCols;
+    for (int i = 0; i < _sizeMap; ++i) {
+        rowsAndCols.push_back(getRow(i));
+        rowsAndCols.push_back(getCol(i));
+    }
+
+    std::vector<int> counterOcc;
+    std::for_each(rowsAndCols.begin(), rowsAndCols.end(), [&counterOcc](std::vector<Pawn> &vec) -> void {
+       counterOcc.push_back(std::count(vec.begin(), vec.end(), Black));
+       counterOcc.push_back(std::count(vec.begin(), vec.end(), White));
+    });
+
+
+    return (std::all_of(_currentGrid.begin(), _currentGrid.end(),
+                       [](Pawn p)->bool { return (p != Empty);}) &&
+            std::all_of(isValid.begin(), isValid.end(), [](bool b)-> bool {return b;}) &&
+            std::all_of(counterOcc.begin(), counterOcc.end(), [this](int v) -> bool {return _sizeMap == 2 * v;}));
 }
 
 void ModelTakuzu::registerPlayAt(int i, int j)
