@@ -771,6 +771,12 @@ void ModelTakuzu::registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int 
     chooseMapPool(difficulty, size);
 }
 
+void ModelTakuzu::registerAttemptToEndGame()
+{
+    bool winStatus = doFinalCheck();
+    emit notifyGameEnd(winStatus);
+}
+
 
 
 QChar ModelTakuzu::toQChar(Pawn pawn)
