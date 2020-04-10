@@ -88,6 +88,7 @@ void ModelTakuzu::chooseMapPool(ModelTakuzu::Difficulty difficulty, int size)
     _sizeMap = size;
     loadFile(QString(name));
     setRandomMap();
+    emit notifyNumberMap(_difficulty, _sizeMap, _chosenMap, _nbMaps);
 }
 
 int ModelTakuzu::setMap(int chosenMap)

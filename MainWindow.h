@@ -36,6 +36,7 @@ public slots:
     void registerAboutPressed();
     void registerEndGame(bool win);
     void registerShortcutsPressed();
+    void registerNumberMap(ModelTakuzu::Difficulty difficulty, int sizeMap, int chosenMap, int nbMaps);
 
 private:
     Ui::MainWindow* _ui;
