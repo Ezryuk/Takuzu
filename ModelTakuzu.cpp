@@ -572,6 +572,7 @@ void ModelTakuzu::playAt(int i, int j, Pawn pawn)
     _currentGrid[i * _sizeMap + j] = newPawn;
     positionIsValid(i, j);
     emit notifyNewPawn(i, j, pawn);
+    emit notifyEndGame();
 }
 
 bool ModelTakuzu::positionIsValid(int i, int j)
@@ -773,8 +774,9 @@ void ModelTakuzu::registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int 
 
 void ModelTakuzu::registerAttemptToEndGame()
 {
-    bool winStatus = doFinalCheck();
-    emit notifyGameEnd(winStatus);
+    bool win = doFinalCheck();
+    if (win)
+        emit notifyEndGame();
 }
 
 
