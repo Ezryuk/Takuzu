@@ -153,6 +153,7 @@ signals:
 public slots:
     void registerPlayAt(int i, int j);
     void registerChooseMapPool(ModelTakuzu::Difficulty difficulty, int size);
+    void registerAttemptToEndGame();
 
 private: // methods
     void loadFile(const QString &name);

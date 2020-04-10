@@ -88,12 +88,14 @@ void MainWindow::registerAboutPressed()
                              "(c) 2020 Christian Zheng and Quentin Derambure");
 }
 
-void MainWindow::registerEndGame()
+void MainWindow::registerEndGame(bool winStatus)
 {
-    _chrono->stop();
-    QMessageBox::information(this, "Victory !", "You won the game in "
-                             + QString::number(_time->minute()) + " minutes and "
-                             + QString::number(_time->second()) + " !");
+    if (winStatus) {
+        _chrono->stop();
+        QMessageBox::information(this, "Victory !", "You won the game in "
+                                 + QString::number(_time->minute()) + " minutes and "
+                                 + QString::number(_time->second()) + " seconds !");
+    }
 }
 
 QWidget *MainWindow::getGrid() const
@@ -114,4 +116,9 @@ QToolButton *MainWindow::getUndoButton() const
 QLabel *MainWindow::getLabelNbUndo() const
 {
     return _ui->labelUndo;
+}
+
+QPushButton *MainWindow::getSubmitButton() const
+{
+    return _ui->submitButton;
 }

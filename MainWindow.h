@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QToolButton>
 #include <QLabel>
+#include <QPushButton>
 #include <ModelTakuzu.h>
 
 namespace Ui {
@@ -22,6 +23,7 @@ public:
     QToolButton *getRedoButton() const;
     QToolButton *getUndoButton() const;
     QLabel *getLabelNbUndo() const;
+    QPushButton *getSubmitButton() const;
 
 signals:
     void notifyMapChosen(ModelTakuzu::Difficulty level, int size);
@@ -32,7 +34,7 @@ public slots:
     void registerQuitPressed();
     void registerRulesPressed();
     void registerAboutPressed();
-    void registerEndGame();
+    void registerEndGame(bool winStatus);
 
 private:
     Ui::MainWindow* _ui;
