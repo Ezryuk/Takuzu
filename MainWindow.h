@@ -35,6 +35,7 @@ public slots:
     void registerRulesPressed();
     void registerAboutPressed();
     void registerEndGame(bool win);
+    void registerShortcutsPressed();
 
 private:
     Ui::MainWindow* _ui;

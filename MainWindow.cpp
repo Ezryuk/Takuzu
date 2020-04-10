@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_ui->actionQuit, SIGNAL(triggered()), this, SLOT(registerQuitPressed()));
     connect(_ui->actionRules, SIGNAL(triggered()), this, SLOT(registerRulesPressed()));
     connect(_ui->actionAbout, SIGNAL(triggered()), this, SLOT(registerAboutPressed()));
+    connect(_ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(registerShortcutsPressed()));
 }
 
 MainWindow::~MainWindow()
@@ -116,6 +117,15 @@ void MainWindow::registerEndGame(bool winStatus)
         });
         animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
+}
+
+void MainWindow::registerShortcutsPressed()
+{
+    QMessageBox::information(this, "Shortcuts", "New Game : CTRL + N\n"
+                             "Quit : CTRL + Q\n"
+                             "Undo : CTRL + Z\n"
+                             "Redo : CTRL + SHIFT + Z\n"
+                             "Submit : Space");
 }
 
 QWidget *MainWindow::getGrid() const
