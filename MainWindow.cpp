@@ -1,11 +1,11 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include <QInputDialog>
-#include <QTimer>
-#include <QMessageBox>
 #include <QDebug>
 #include <QGraphicsEffect>
+#include <QInputDialog>
+#include <QMessageBox>
 #include <QPropertyAnimation>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
