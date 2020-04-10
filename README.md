@@ -42,7 +42,7 @@ Most of the communication between the classes of our software takes place with t
 Christian: I worked on the model part of the project. I wrote most of the ModelTakuzu class, as well as the undo/redo management.
 
 ----
-Quentin:
+Quentin: I worked on the view part of the project. Thus, I wrote the Grid and MainWindow classes. I also wrote a very small part of the model code to pick a grid in particular and not a random grid.
 
 ----
 Common: We worked together simultaneously on the development of the presenter, which contains all the connections between the signals of one and the slots of the other. Each also helped debugging the other's part.
