@@ -68,6 +68,13 @@ void MainWindow::registerChronoChanged()
     _ui->timeEdit->setTime(QTime(0,0).addMSecs(_time->elapsed()));
 }
 
+void MainWindow::registerNumberMap(ModelTakuzu::Difficulty difficulty, int sizeMap, int chosenMap, int nbMaps)
+{
+    _ui->mapLabel->setText("Grid : " + QString::number(sizeMap)+ "x" + QString::number(sizeMap)
+                           + " " + QString(difficulty) + " "
+                           + QString::number(chosenMap) + "/" + QString::number(nbMaps));
+}
+
 void MainWindow::registerQuitPressed()
 {
     QMessageBox::StandardButton button;
